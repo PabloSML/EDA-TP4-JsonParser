@@ -115,10 +115,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="field.h" />
     <ClInclude Include="JSONError.h" />
     <ClInclude Include="JSONObject.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="field.cpp" />
     <ClCompile Include="JSONError.cpp" />
     <ClCompile Include="JSONObject.cpp" />
   </ItemGroup>

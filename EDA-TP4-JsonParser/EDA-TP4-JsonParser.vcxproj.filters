@@ -21,12 +21,18 @@
     <ClInclude Include="JSONError.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="field.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JSONObject.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="JSONError.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="field.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>

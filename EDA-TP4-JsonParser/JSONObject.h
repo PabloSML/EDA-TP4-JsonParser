@@ -1,5 +1,8 @@
 #pragma once
+#include "field.h"
 #include "JSONError.h"
+
+using namespace std;
 
 class JSONObject
 {
@@ -11,7 +14,7 @@ public:
 	* funciones
 	* parseString() definidas más abajo
 	*/
-	JSONObject();
+	//JSONObject() {}
 	/* Permiten crear un JSONObject con el string s (en el segundo caso NULL
 	* terminated)
 	* recibido como parámetro.
@@ -22,12 +25,13 @@ public:
 	* y se le informará al usuario cuando este invoque a getError mediante
 	* el objeto JSONError
 	*/
+	JSONObject(void);
 	JSONObject(string& s);
 	JSONObject(const char * s);
 
 	/* Devuelve en su nombre la cantidad de campos que contiene el
 	* JSONObject */
-	unsigned int getFieldCount(void);
+	unsigned int getFieldCount(void) { return fieldCount; }
 
 
 	/* Devuelve en su nombre el tipo de campo de f. Los posibles tipos son
@@ -87,6 +91,26 @@ public:
 	*/
 	bool isFieldPresent(const char * f);
 
+		/* Devuelven en su nombre una variable creada en el heap con las
+	 * siguientes característias:
+	 * si f es de tipo "object" crea en el heap un JSONObject lo inicializa
+	 * con el objeto contenido en f y lo devuelve en su nombre
+	 * si f es de tipo "array" crea en el heap un arreglo de elementos tipo
+	 * getArrayType() y cantidad getFieldSize()
+	 * copia en dicho arreglo el arreglo contenido en f y lo devuelve en su
+	 * nombre.
+	 * si f es de tipo "string" crea en el heap un string, copia el string
+	 * contenido en f y lo devuelve en su nombre.
+	 * si f es de tipo "number" crea en el heap un double, copia el número
+	 * contenido en f y lo devuelve en su nombre.
+	 * si f es de tipo "bool" crea en el heap un bool, inicializa el bool en
+	 * true o false según f y lo devuelve en su nombre.
+	 * si f no pertenece al JSONObject o la función encuentra un error
+	 * devuelve NULL en su nombre y genera un error que almacena
+	 * internamente.
+	 */
+		void * copyField(const char * f);
+
 	/* Devuelven en su nombre una variable creada en el heap con las
 	* siguientes característias:
 	* si f es de tipo "object" crea en el heap un JSONObject lo inicializa
@@ -139,7 +163,7 @@ public:
 	void print(void);
 
 	/* Devuelve en su nombre un JSONError según se explica en JSONError.h*/
-	JSONError getError(void);
+	JSONError getError(void) { return err; }
 
 	/*
 	* En caso de generar un objeto JSON por defecto
@@ -177,4 +201,9 @@ public:
 	* único caso en que un objeto JSON puede tener valores sin estar asociados
 	* a una campo.
 	*/
+
+private:
+	unsigned long fieldCount;
+	field* fields;
+	JSONError err;
 };
