@@ -44,7 +44,7 @@ JSONObject::parseFields(string& s) {
 					end = s.find_first_of('"', start);
 					/*int check=s.find_first_of("\"); no me deja escapar la barra invertida*/
 				}
-				if (start == '{') {        //caso 2: si me encuentro con un objeto
+				else if (start == '{') {        //caso 2: si me encuentro con un objeto
 					sum++;
 					end = start + 1;
 					for (end; sum != 0; end++) {
@@ -56,7 +56,7 @@ JSONObject::parseFields(string& s) {
 						}
 					}
 				}
-				if (start == '[') {        //caso 3: si me encuentro con un array
+				else if (start == '[') {        //caso 3: si me encuentro con un array
 					sum++;
 					end = start + 1;
 					for (end; sum != 0; end++) {
