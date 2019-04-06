@@ -133,10 +133,10 @@ JSONObject::getFieldType(const char * f)
 	return type;
 }
 
-int
+unsigned int
 JSONObject::howManyFields(string& s)
 {
-	int fields = 0;
+	unsigned int fields = 0;
 	int sum = 0;
 	unsigned int i = 0;
 	unsigned int end = s.find_last_of('}');
