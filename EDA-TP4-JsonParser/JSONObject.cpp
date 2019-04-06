@@ -255,24 +255,23 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 
 		if (found)
 		{
-			void* copy;
+			void* newJSON;
 			i--;
 			if (fields[i].getFieldType() == string("object"))
 			{
-				copy = new JSONObject(fields[i].getContent());
+				newJSON = new JSONObject(fields[i].getContent());
 			}
 			else if (fields[i].getFieldType() == string("array"))
 			{
-				string type = string(getArrayType(f));
-
+				newJSON = new 
 			}
 			else if (fields[i].getFieldType() == string("string"))
 			{
-				copy = new string(fields[i].getContent());
+
 			}
 			else if (fields[i].getFieldType() == string("number"))
 			{
-				copy = new double(stod(fields[i].getContent()));
+				newJSON = new double(stod(fields[i].getContent()));
 			}
 			else if (fields[i].getFieldType() == string("bool"))
 			{
@@ -315,22 +314,23 @@ JSONObject::isFieldPresent(const char* f)
 unsigned int
 JSONObject::getFieldSize(const char * f)
 {
+	unsigned int size = 0;
 	if (isFieldPresent(f))
 	{
 		if (!strcmp(getFieldType(f), "bool"))
 		{
-			return sizeof(bool);
+			size = sizeof(bool);
 		}
 		else if (!strcmp(getFieldType(f), "number"))
 		{
-			return sizeof(double);
+			size = sizeof(double);
 		}
 		else if (!strcmp(getFieldType(f), "object"))
 		{
-			JSONObject* copy = (JSONObject*)copyField(f);
+			JSONObject* copy =(JSONObject*) copyField(f);
 			unsigned int cant = copy->getFieldCount();
 			delete copy;
-			return cant;
+			size = cant;
 		}
 		else if (!strcmp(getFieldType(f), "string"))
 		{
@@ -338,17 +338,83 @@ JSONObject::getFieldSize(const char * f)
 			{
 				if (fields[i].getFieldName() == string(f))
 				{
-					return fields[i].getContent().length;
+					size = fields[i].getContent().length;
 				}
 			}
 		}
 		else if (!strcmp(getFieldType(f), "array"))
 		{
-			
+			int cont = 0;
+
+			for (int i = 0; i < fieldCount; i++)
+			{
+				if (fields[i].getFieldName() == string(f))
+				{
+					if (!strcmp(getArrayType(f), "string"))
+					{
+						for (int a = 0; a < fields[i].getContent().length; a++)
+						{
+							if (fields[i].getContent()[a] == '"')
+							{
+								cont++;
+							}
+						}
+						return cont / 2;
+					}
+					else if (!strcmp(getArrayType(f), "number") || !strcmp(getArrayType(f), "bool"))
+					{
+						for (int a = 0; a < fields[i].getContent().length; a++)
+						{
+							if (fields[i].getContent()[a] == ',')
+							{
+								cont++;
+							}
+						}
+						return cont + 1;
+					}
+					else if (!strcmp(getArrayType(f), "object"))
+					{
+						int elements = 0;
+						for (int a = 0; a < fields[i].getContent().length; a++)
+						{
+							if (fields[i].getContent()[a] == '{')
+							{
+								cont++;
+							}
+							if (fields[i].getContent()[a] == '}')
+							{
+								cont--;
+							}
+							if (cont == 0)
+							{
+								elements++;
+							}
+						}
+						size = elements;
+					}
+					else if (!strcmp(getArrayType(f), "array"))
+					{
+						int elements = 0;
+						for (int a = 0; a < fields[i].getContent().length; a++)
+						{
+							if (fields[i].getContent()[a] == '[')
+							{
+								cont++;
+							}
+							if (fields[i].getContent()[a] == ']')
+							{
+								cont--;
+							}
+							if (cont == 0)
+							{
+								elements++;
+							}
+						}
+						size = elements;
+					}
+				}
+			}
 		}
 	}
-	else
-	{
-		return 0;
-	}
+	return size;
 }
