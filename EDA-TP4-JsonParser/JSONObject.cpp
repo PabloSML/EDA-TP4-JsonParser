@@ -21,7 +21,6 @@ JSONObject::JSONObject(const char * s)
 
 }
 
-
 void
 JSONObject::parseFields(string& s) {
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
@@ -38,7 +37,7 @@ JSONObject::parseFields(string& s) {
 			i = s.find_first_not_of(': ', i);
 			while (!saved) {     //quiero guardar el content segun que es:objeto array string o cualquier otra cosa
 				int start = i;
-				int end;
+				int end=start+1;
 				if (start == '"') {           //caso 1: si me encuentro con un string 
 					start++;
 					end = s.find_first_of('"', start);
@@ -58,7 +57,6 @@ JSONObject::parseFields(string& s) {
 				}
 				else if (start == '[') {        //caso 3: si me encuentro con un array
 					sum++;
-					end = start + 1;
 					for (end; sum != 0; end++) {
 						if (s[end] == '[') {
 							sum++;
@@ -69,7 +67,7 @@ JSONObject::parseFields(string& s) {
 					}
 				}
 				else {
-					end = s.find_first_of(",{");     //caso 4: si me encuentro con cualquier otra cosa
+					end = s.find_first_of(",{", start+1);     //caso 4: si me encuentro con cualquier otra cosa
 				}
 				fields[counter].setContent(s.substr(start, end));
 				i = end + 1;
