@@ -3,7 +3,7 @@
 #include <iostream>;
 #define INITIALSIZE 100
 
-#define MARKERS "{[\"tfn-0123456789" // Todos los posibles primeros caracteres de un json value
+//#define MARKERS "{[\"tfn-0123456789" // Todos los posibles primeros caracteres de un json value
 
 JSONObject::JSONObject(void){}
 
@@ -204,7 +204,7 @@ JSONObject::getArrayType(const char* f)
 			if (fields[i].getFieldType == string("array"))
 			{
 				string content = fields[i].getContent();
-				unsigned int index = content.find_first_of(MARKERS, 1); // Se busca un marker para ver el tipo de elemento y se evita el primer caracter del content ("[") 
+				unsigned int index = content.find_first_not_of(' '); // Se busca un marker para ver el tipo de elemento ({[\"tfn-0123456789)
 
 				if (index == string::npos || content[index] == '{' || content[index] == 'n')
 					type = "object";
