@@ -255,23 +255,24 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 
 		if (found)
 		{
-			void* newJSON;
+			void* copy;
 			i--;
 			if (fields[i].getFieldType() == string("object"))
 			{
-				newJSON = new JSONObject(fields[i].getContent());
+				copy = new JSONObject(fields[i].getContent());
 			}
 			else if (fields[i].getFieldType() == string("array"))
 			{
-				newJSON = new 
+				string type = string(getArrayType(f));
+
 			}
 			else if (fields[i].getFieldType() == string("string"))
 			{
-
+				copy = new string(fields[i].getContent());
 			}
 			else if (fields[i].getFieldType() == string("number"))
 			{
-				newJSON = new double(stod(fields[i].getContent()));
+				copy = new double(stod(fields[i].getContent()));
 			}
 			else if (fields[i].getFieldType() == string("bool"))
 			{
