@@ -223,7 +223,7 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 	bool found = false;
 	for (int i = 0; i < fieldCount && !found; i++)
 	{
-		found = fields[i].getFieldName() == f;
+		found = fields[i].getFieldName() == string(f);
 
 		if (found)
 		{
@@ -236,7 +236,24 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 			else if (fields[i].getFieldType() == string("array"))
 			{
 				string type = string(getArrayType(f));
-				if(type == string("object"))
+				unsigned int size = getFieldSize(f);
+
+				if (type == string("object"))
+				{
+					copy = new JSONObject[size];
+					for (int i = 0; i < size; i++)
+					{
+						
+					}
+				}
+				else if (type == string("bool"))
+				{
+					copy = new bool[size];
+					for (int i = 0; i < size; i++)
+					{
+						((bool*)copy)[i] = copyArrayValue(f, i);
+					}
+				}
 			}
 			else if (fields[i].getFieldType() == string("string"))
 			{
