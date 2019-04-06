@@ -53,7 +53,7 @@ JSONObject::parseFields(string& s) {
 			}
 							else
 			{
-				fields[count].setFieldName(tosave);
+				fields[counter].setFieldName(tosave);
 				state = NEWCONTENT;
 			}
 			}
@@ -76,7 +76,7 @@ JSONObject::parseFields(string& s) {
 					tosave.push_back(s[i]);
 				}
 				else if (sum == 0) {
-					fields[count].setContent(tosave);
+					fields[counter].setContent(tosave);
 					state = DONE;
 				}
 
