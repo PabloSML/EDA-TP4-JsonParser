@@ -44,9 +44,10 @@ JSONObject::parseFields(string& s) {
 					int check = s.find_first_of('\ ', start);  //las comillas no pueden estar escapadas por la barra
 					while (check == end - 1)
 					{
-						end + 1;
-						end = s.find_first_of('"', end);
-						check = s.find_first_of('\ ', start);
+						aux=end + 1;
+						end = s.find_first_of('"', aux);
+						check = s.find_first_of('\ ', aux);
+
 					}
 				}
 				else if (start == '{') {        //caso 2: si me encuentro con un objeto
