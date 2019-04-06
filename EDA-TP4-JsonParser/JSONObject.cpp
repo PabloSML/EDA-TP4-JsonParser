@@ -30,46 +30,54 @@ JSONObject::parseFields(string& s) {
 		string tosave;
 		int sum = 0;
 		enum states { INITIAL, NEWFIELD, FIELDNAME, FIELDCONTENT, NEWCONTENT, DONE };
-		//::iterator iter;
-		//iter = s.begin();
 		states state = INITIAL;
-		//while (iter < s.end()) {
 		while(i<s.length){
 			switch (state) {
-			case INITIAL: { if (s[i] == '"') {
+			case INITIAL: 
+			{ 
+				if (s[i] == '"') 
+				{
 				state = NEWFIELD;
+				}
 			}
-			}
-						  break;
-			case NEWFIELD: {
+				break;
+			case NEWFIELD: 
+			{
 				counter++;
 				tosave = "";
 				tosave.push_back(s[i]);
 				state = FIELDNAME;
 			}
-						   break;
-			case FIELDNAME: {if (s[i] != '"') {
-				tosave.push_back(s[i]);
-			}
-							else
+				break;
+			case FIELDNAME: 
 			{
-				fields[counter].setFieldName(tosave);
-				state = NEWCONTENT;
+				if (s[i] != '"') 
+				{
+					tosave.push_back(s[i]);
+				}
+				else
+				{
+					fields[counter].setFieldName(tosave);
+					state = NEWCONTENT;
+				}
 			}
+				break;
+			case NEWCONTENT: 
+			{ 
+				if (s[i] == '{') 
+				{
+					tosave = "";
+					sum++;
+					state = FIELDCONTENT;
+			    }
 			}
-							break;
-			case NEWCONTENT: { if (s[i] == '{') {
-				tosave = "";
-				sum++;
-				state = FIELDCONTENT;
-			   }
-			}
-							 break;
-			case FIELDCONTENT: {
+				break;
+			case FIELDCONTENT: 
+			{
 				if (s[i] == '{') {
 					sum++;
 				}
-				if (s[i] == '{') {
+				else if (s[i] == '}') {
 					sum--;
 				}
 				if (sum != 0) {
@@ -81,12 +89,15 @@ JSONObject::parseFields(string& s) {
 				}
 
 			}
-					 break;
-			case DONE: {if (s[i] == '"') {
-				state = NEWFIELD;
+				break;
+			case DONE: 
+			{
+				if (s[i] == '"') 
+				{
+					state = NEWFIELD;
+				}
 			}
-			}
-					   break;
+				break;
 			}
 			i++;
 		}
