@@ -21,11 +21,12 @@ JSONObject::JSONObject(const char * s)
 
 }
 
+void
 JSONObject::parseFields(string& s) {
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
-		fieldCount = howManyFields(s);
+		fieldCount=howManyFields(s);
 		fields = new Fields[fieldCount];
-		counter = 0;
+		int counter = 0;
 		string tosave;
 		int sum = 0;
 		enum states { INITIAL, NEWFIELD, FIELDNAME, FIELDCONTENT, NEWCONTENT, DONE };
@@ -51,12 +52,13 @@ JSONObject::parseFields(string& s) {
 			}
 							else
 			{
-				fields[cantFields].setFieldName(tosave);
+				fields[count].setFieldName(tosave);
 				state = NEWCONTENT;
 			}
 			}
 							break;
 			case NEWCONTENT: { if (*iter == '{') {
+				tosave = "";
 				sum++;
 				state = FIELDCONTENT;
 			}
@@ -66,7 +68,7 @@ JSONObject::parseFields(string& s) {
 				if (*iter == '{') {
 					sum++;
 				}
-				if (*iter == '}') {
+				if (*iter == '{') {
 					sum--;
 				}
 				if (sum != 0) {
@@ -74,7 +76,7 @@ JSONObject::parseFields(string& s) {
 				}
 				else if (sum == 0) {
 					sum = 0;
-					fields[cantFields].setContent(tosave);
+					fields[count].setContent(tosave);
 					state = DONE;
 				}
 
@@ -92,12 +94,11 @@ JSONObject::parseFields(string& s) {
 
 }
 
-JSONObject::getFieldCount() {
+int JSONObject::getFieldCount() {
 	return fieldCount;
 }
 
-const char * 
-JSONObject::getFieldType(const char * f)
+const char * JSONObject::getFieldType(const char * f)
 {
 	bool found = false;
 	const char* type;
@@ -132,8 +133,8 @@ JSONObject::getFieldType(const char * f)
 	return type;
 }
 
-int JSSONObject::howManyFields(string& s) {
-	int fields = 0;
+unsigned int JSSONObject::howManyFields(string& s) {
+	unsigned int fields = 0;
 	int sum = 0;
 	string::iterator iter;
 	iter = s.begin();
@@ -149,8 +150,8 @@ int JSSONObject::howManyFields(string& s) {
 		}
 					break;
 		case FOUNDANDSKIP: { if (*iter == '{') {
-							sum++;
-						   }
+			sum++;
+		}
 						   if (*iter == '}') {
 							   sum--;
 						   }
