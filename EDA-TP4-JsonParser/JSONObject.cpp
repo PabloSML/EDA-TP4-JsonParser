@@ -7,77 +7,9 @@
 
 JSONObject::JSONObject(void){}
 
-JSONObject::JSONObject(string& s)
-{
-	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
-		fieldCount = howManyFields(s);
-		fields = new Fields[fieldCount];
-		counter = 0;
-		string tosave; 
-		int sum=0; 
-		enum states {INITIAL, NEWFIELD, FIELDNAME, FIELDCONTENT, NEWCONTENT, DONE};
-		string::iterator iter;
-		iter = s.begin();
-		states state = INITIAL;
-			while(iter<s.end()){
-				switch (state) {
-				case INITIAL: { if (*iter == '"') {
-					state = NEWFIELD;
-				}
-				}
-							  break;
-				case NEWFIELD: {
-					counter++;
-					tosave = "";
-					tosave.push_back(*iter);
-					state = FIELDNAME;
-				}
-							   break;
-				case FIELDNAME: {if (*iter != '"') {
-					    tosave.push_back(*iter);
-				        }
-								else
-				        {
-					    fields[cantFields].setFieldName(tosave);
-				     	state = NEWCONTENT;
-				        }
-						}
-								break;
-				case NEWCONTENT: { if (*iter == '{') {
-					sum++;
-					state = FIELDCONTENT;
-				}
-				}
-								 break;
-				case FIELDCONTENT: {
-					if (*iter == '{') {
-						sum++;
-					}
-					if (*iter == '}') {
-						sum--;
-					}
-					if (sum != 0) {
-						tosave.push_back(*iter);
-					}
-					else if (sum == 0) {
-						sum = 0;
-						fields[cantFields].setContent(tosave);
-						state = DONE;
-					}
-
-				}
-								   break;
-				case DONE: {if (*iter == '"') {
-					state = NEWFIELD;
-				}
-				}
-						   break;
-				}
-				iter++;
-				}
-			}
-
-	}
+JSONObject::JSONObject(string& s){
+	parseFields(s);
+}
 	
 
 
@@ -85,7 +17,78 @@ JSONObject::JSONObject(const char * s)
 {
 	string to_app;
 	to_app.append(s);
-	JSONObject(to_app);
+	parseFields(to_app);
+
+}
+
+JSONObject::parseFields(string& s) {
+	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
+		fieldCount = howManyFields(s);
+		fields = new Fields[fieldCount];
+		counter = 0;
+		string tosave;
+		int sum = 0;
+		enum states { INITIAL, NEWFIELD, FIELDNAME, FIELDCONTENT, NEWCONTENT, DONE };
+		string::iterator iter;
+		iter = s.begin();
+		states state = INITIAL;
+		while (iter < s.end()) {
+			switch (state) {
+			case INITIAL: { if (*iter == '"') {
+				state = NEWFIELD;
+			}
+			}
+						  break;
+			case NEWFIELD: {
+				counter++;
+				tosave = "";
+				tosave.push_back(*iter);
+				state = FIELDNAME;
+			}
+						   break;
+			case FIELDNAME: {if (*iter != '"') {
+				tosave.push_back(*iter);
+			}
+							else
+			{
+				fields[cantFields].setFieldName(tosave);
+				state = NEWCONTENT;
+			}
+			}
+							break;
+			case NEWCONTENT: { if (*iter == '{') {
+				sum++;
+				state = FIELDCONTENT;
+			}
+			}
+							 break;
+			case FIELDCONTENT: {
+				if (*iter == '{') {
+					sum++;
+				}
+				if (*iter == '}') {
+					sum--;
+				}
+				if (sum != 0) {
+					tosave.push_back(*iter);
+				}
+				else if (sum == 0) {
+					sum = 0;
+					fields[cantFields].setContent(tosave);
+					state = DONE;
+				}
+
+			}
+							   break;
+			case DONE: {if (*iter == '"') {
+				state = NEWFIELD;
+			}
+			}
+					   break;
+			}
+			iter++;
+		}
+	}
 
 }
 
@@ -139,14 +142,15 @@ int JSSONObject::howManyFields(string& s) {
 	while (iter != s.end()) {
 		switch (state)
 		{
-		case START: if (*iter == ':') {
-			fields++;
-			state = FOUNDANDSKIP;
+		case START: { if (*iter == ':') {
+					fields++;
+					state = FOUNDANDSKIP;
+					}
 		}
 					break;
 		case FOUNDANDSKIP: { if (*iter == '{') {
-			sum++;
-		}
+							sum++;
+						   }
 						   if (*iter == '}') {
 							   sum--;
 						   }

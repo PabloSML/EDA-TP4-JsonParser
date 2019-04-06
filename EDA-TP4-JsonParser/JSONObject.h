@@ -209,4 +209,5 @@ private:
 	JSONError err;
 	bool ErrorCheck(string& s);
 	int howManyFields(string& s);
+	void parseFields(string& s);
 };
