@@ -2,7 +2,8 @@
 #include <iostream>;
 #define INITIALSIZE 100
 
-JSONObject::JSONObject(void){}
+JSONObject::JSONObject(void){
+}
 
 JSONObject::JSONObject(string& s)
 {
