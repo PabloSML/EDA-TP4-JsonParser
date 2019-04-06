@@ -1,4 +1,6 @@
 #include "JSONObject.h"
+#include <cstring>
+#include <array>
 #include <cctype>
 #include <iostream>;
 #define INITIALSIZE 100
@@ -225,23 +227,24 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 
 		if (found)
 		{
-			void* newJSON;
+			void* copy;
 			i--;
 			if (fields[i].getFieldType() == string("object"))
 			{
-				newJSON = new JSONObject(fields[i].getContent());
+				copy = new JSONObject(fields[i].getContent());
 			}
 			else if (fields[i].getFieldType() == string("array"))
 			{
-				newJSON = new 
+				string type = string(getArrayType(f));
+
 			}
 			else if (fields[i].getFieldType() == string("string"))
 			{
-
+				copy = new string(fields[i].getContent());
 			}
 			else if (fields[i].getFieldType() == string("number"))
 			{
-				newJSON = new double(stod(fields[i].getContent()));
+				copy = new double(stod(fields[i].getContent()));
 			}
 			else if (fields[i].getFieldType() == string("bool"))
 			{
@@ -267,3 +270,124 @@ JSONObject::isFieldPresent(const char* f)
 	return found;
 }
 
+/* Devuelve en su nombre el tamaño del campo f, donde por tamaño se
+	* entiende:
+	* si f es de tipo "object" la cantidad de campos que tiene el objeto
+	* (pensar si en este caso conviene generar un JSONObject temporal) con
+	* el contenido del campo f y devolver getFieldCount de dicho objeto).
+	* si f es de tipo "array" devuelve la cantidad de elementos en el
+	* arreglo.
+	* si f es de tipo "string" devuelve la cantidad de caracteres en el
+	* string.
+	* si f es de tipo "number" devuelve sizeof(double).
+	* si f es de tipo "bool" devuelve sizeof(bool).
+	* si f es no pertenece al objeto devuelve 0. En este último caso genera
+	* un error que almacena internamente
+	*/
+unsigned int
+JSONObject::getFieldSize(const char * f)
+{
+	unsigned int size = 0;
+	if (isFieldPresent(f))
+	{
+		if (!strcmp(getFieldType(f), "bool"))
+		{
+			size = sizeof(bool);
+		}
+		else if (!strcmp(getFieldType(f), "number"))
+		{
+			size = sizeof(double);
+		}
+		else if (!strcmp(getFieldType(f), "object"))
+		{
+			JSONObject* copy =(JSONObject*) copyField(f);
+			unsigned int cant = copy->getFieldCount();
+			delete copy;
+			size = cant;
+		}
+		else if (!strcmp(getFieldType(f), "string"))
+		{
+			for (int i = 0; i < fieldCount; i++)
+			{
+				if (fields[i].getFieldName() == string(f))
+				{
+					size = fields[i].getContent().length;
+				}
+			}
+		}
+		else if (!strcmp(getFieldType(f), "array"))
+		{
+			int cont = 0;
+
+			for (int i = 0; i < fieldCount; i++)
+			{
+				if (fields[i].getFieldName() == string(f))
+				{
+					if (!strcmp(getArrayType(f), "string"))
+					{
+						for (int a = 0; a < fields[i].getContent().length; a++)
+						{
+							if (fields[i].getContent()[a] == '"')
+							{
+								cont++;
+							}
+						}
+						return cont / 2;
+					}
+					else if (!strcmp(getArrayType(f), "number") || !strcmp(getArrayType(f), "bool"))
+					{
+						for (int a = 0; a < fields[i].getContent().length; a++)
+						{
+							if (fields[i].getContent()[a] == ',')
+							{
+								cont++;
+							}
+						}
+						return cont + 1;
+					}
+					else if (!strcmp(getArrayType(f), "object"))
+					{
+						int elements = 0;
+						for (int a = 0; a < fields[i].getContent().length; a++)
+						{
+							if (fields[i].getContent()[a] == '{')
+							{
+								cont++;
+							}
+							if (fields[i].getContent()[a] == '}')
+							{
+								cont--;
+							}
+							if (cont == 0)
+							{
+								elements++;
+							}
+						}
+						size = elements;
+					}
+					else if (!strcmp(getArrayType(f), "array"))
+					{
+						int elements = 0;
+						for (int a = 0; a < fields[i].getContent().length; a++)
+						{
+							if (fields[i].getContent()[a] == '[')
+							{
+								cont++;
+							}
+							if (fields[i].getContent()[a] == ']')
+							{
+								cont--;
+							}
+							if (cont == 0)
+							{
+								elements++;
+							}
+						}
+						size = elements;
+					}
+				}
+			}
+		}
+	}
+	return size;
+}
