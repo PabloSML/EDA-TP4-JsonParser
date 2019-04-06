@@ -21,6 +21,9 @@ public:
 	string getErrorString(void);
 	bool hasFailed(void);
 
+	void setErrorString(string err);
+	void setError(bool err);
+
 private:
 	bool error;
 	string errorString;
