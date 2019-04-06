@@ -15,11 +15,11 @@ Field::getContent() {
 }
 
 void 
-Field::setFieldName(string& n) {
+Field::setFieldName(string n) {
 	fieldName = n;
 }
 
-void Field::setContent(string& c) {
+void Field::setContent(string c) {
 	content = c;
 }
 void Field::setFieldType(const char* t) {
