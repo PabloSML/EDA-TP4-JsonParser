@@ -391,3 +391,16 @@ JSONObject::print(void)
 	}
 	cout << "End of JSON object" << endl;
 }
+
+bool
+JSONObject::isEmpty(void)
+{
+	if (fieldCount == 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
