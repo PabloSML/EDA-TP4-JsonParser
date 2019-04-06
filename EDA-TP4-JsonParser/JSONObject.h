@@ -31,6 +31,7 @@ public:
 
 	/* Devuelve en su nombre la cantidad de campos que contiene el
 	* JSONObject */
+
 	unsigned int getFieldCount(void) { return fieldCount; }
 
 
@@ -204,6 +205,9 @@ public:
 
 private:
 	unsigned long fieldCount;
-	field* fields;
+	Field* fields;
 	JSONError err;
+	bool ErrorCheck(string& s);
+	int cantFields;
+	void addField();
 };

@@ -3,17 +3,18 @@
 #include <string>
 using namespace std;
 
-class field
+class Field
 {
 public:
-	field() {}
-
-	const char* getFieldType() { return fieldType; }
-	string getFieldName() { return fieldName; }
-	string getContent() { return content; }
+	void setFieldName(string& n);
+	void setContent(string& c);
+	void setFieldType(const char* t);
+	const char* getFieldType();
+	string getFieldName();
+	string getContent();
 
 private:
 	const char* fieldType;
-	string fieldName;
+	string& fieldName;
 	string content;
 };
