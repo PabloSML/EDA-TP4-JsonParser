@@ -89,6 +89,7 @@ JSONObject::JSONObject(const char * s)
 
 }
 
+unsigned int
 JSONObject::getFieldCount() {
 	return fieldCount;
 }
@@ -129,7 +130,7 @@ JSONObject::getFieldType(const char * f)
 	return type;
 }
 
-int JSSONObject::howManyFields(string& s) {
+int JSONObject::howManyFields(string& s) {
 	int fields = 0;
 	int sum = 0;
 	string::iterator iter;
