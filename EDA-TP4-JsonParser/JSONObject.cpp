@@ -10,8 +10,6 @@ JSONObject::JSONObject(void){}
 JSONObject::JSONObject(string& s){
 	parseFields(s);
 }
-	
-
 
 JSONObject::JSONObject(const char * s)
 {
@@ -21,11 +19,12 @@ JSONObject::JSONObject(const char * s)
 
 }
 
+
 void
 JSONObject::parseFields(string& s) {
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
-		fieldCount=howManyFields(s);
-		fields = new Fields[fieldCount];
+		fieldCount = howManyFields(s);
+		fields = new Field[fieldCount];
 		int counter = 0;
 		string tosave;
 		int sum = 0;
@@ -94,7 +93,8 @@ JSONObject::parseFields(string& s) {
 
 }
 
-int JSONObject::getFieldCount() {
+unsigned int
+JSONObject::getFieldCount() {
 	return fieldCount;
 }
 
@@ -133,44 +133,60 @@ const char * JSONObject::getFieldType(const char * f)
 	return type;
 }
 
-unsigned int JSSONObject::howManyFields(string& s) {
+unsigned int
+JSONObject::howManyFields(string& s)
+{
 	unsigned int fields = 0;
 	int sum = 0;
-	string::iterator iter;
-	iter = s.begin();
-	enum states { START, SEARCHING, FOUNDANDSKIP};
+	unsigned int i = 0;
+	unsigned int end = s.find_last_of('}');
+	enum states { START, SEARCHING, FOUNDANDSKIP };
 	states state = START;
-	while (iter != s.end()) {
+	while (i < end) {
 		switch (state)
 		{
-		case START: { if (*iter == ':') {
-					fields++;
-					state = FOUNDANDSKIP;
-					}
+		case START:
+		{
+			if (s[i] == ':')
+			{
+				fields++;
+				state = FOUNDANDSKIP;
+			}
 		}
-					break;
-		case FOUNDANDSKIP: { if (*iter == '{') {
-			sum++;
+		break;
+
+		case FOUNDANDSKIP:
+		{
+			i = s.find_first_not_of(' ', i);
+
+			if (s[i] == '{')
+			{
+				sum++;
+			}
+			else if (s[i] == '}')
+			{
+				sum--;
+			}
+			else if (sum == 0)
+			{
+				state = SEARCHING;
+			}
 		}
-						   if (*iter == '}') {
-							   sum--;
-						   }
-						   if (sum == 0) {
-							   state = SEARCHING;
-						   }
+		break;
+
+		case SEARCHING:
+		{
+			if (s[i] == ',')
+			{
+				state = START;
+			}
 		}
-						   break;
-		case SEARCHING: { if (*iter == ',') {
-			              state = START;
-						}
+		break;
 		}
-						break;
-		}
-		iter++;
+		i++;
 	}
 	return fields;
 }
-
 
 const char*
 JSONObject::getArrayType(const char* f)
@@ -213,7 +229,6 @@ JSONObject::getArrayType(const char* f)
 
 	return type;
 }
-
 
 void*
 JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicimos en clase

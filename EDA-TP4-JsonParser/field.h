@@ -6,6 +6,12 @@ using namespace std;
 class Field
 {
 public:
+	Field(){
+		fieldType = NULL;
+		fieldName = string(NULL);
+		content = string(NULL);
+	}
+
 	void setFieldName(string& n);
 	void setContent(string& c);
 	void setFieldType(const char* t);
@@ -15,6 +21,7 @@ public:
 
 private:
 	const char* fieldType;
-	string& fieldName;
+	string fieldName;
+	//string& fieldName;
 	string content;
 };
