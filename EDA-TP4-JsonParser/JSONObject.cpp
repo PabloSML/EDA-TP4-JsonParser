@@ -189,14 +189,16 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 bool
 JSONObject::isFieldPresent(const char* f)
 {
-	unsigned int count = getFieldCount();
-	for (int i = 0; i < count; i++)
+	bool found = false;
+	unsigned int count = fieldCount;
+	for (int i = 0; i < fieldCount && !found; i++)
 	{
-		if (fields[i].getFieldName == f)
+		if (fields[i].getFieldName == string(f))
 		{
-			return true;
+			found = true;
 		}
 	}
-	return false;
+
+	return found;
 }
 
