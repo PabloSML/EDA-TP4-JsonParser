@@ -24,71 +24,55 @@ void
 JSONObject::parseFields(string& s) {
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
 		fieldCount = howManyFields(s);
-		fields = new Field[fieldCount];
-		int counter = 0;
 		int i = 0;
-		string tosave;
-		int sum = 0;
-		enum states { INITIAL, NEWFIELD, FIELDNAME, FIELDCONTENT, NEWCONTENT, DONE };
-		//::iterator iter;
-		//iter = s.begin();
-		states state = INITIAL;
-		//while (iter < s.end()) {
-		while(i<s.length){
-			switch (state) {
-			case INITIAL: { if (s[i] == '"') {
-				state = NEWFIELD;
-			}
-			}
-						  break;
-			case NEWFIELD: {
-				counter++;
-				tosave = "";
-				tosave.push_back(s[i]);
-				state = FIELDNAME;
-			}
-						   break;
-			case FIELDNAME: {if (s[i] != '"') {
-				tosave.push_back(s[i]);
-			}
-							else
-			{
-				fields[counter].setFieldName(tosave);
-				state = NEWCONTENT;
-			}
-			}
-							break;
-			case NEWCONTENT: { if (s[i] == '{') {
-				tosave = "";
-				sum++;
-				state = FIELDCONTENT;
-			   }
-			}
-							 break;
-			case FIELDCONTENT: {
-				if (s[i] == '{') {
+		for (int counter = 0; counter < fieldCount; counter++) {
+			bool saved = false;
+			int sum = 0;
+			int aux = s.find_first_of('"', i);  //guardo el name
+			i = aux + 1;
+			aux = s.find_first_of('"', i);
+			fields[counter].setFieldName(s.substr(i, aux + 1));
+			i = aux + 1;
+			i = s.find_first_not_of(': ', i);
+			while (!saved) {     //quiero guardar el content segun que es:objeto array string o cualquier otra cosa
+				int start = i;
+				int end;
+				if (start == '"') {           //caso 1: si me encuentro con un string 
+					start++;
+					end = s.find_first_of('"', start);
+					/*int check=s.find_first_of("\"); no me deja escapar la barra invertida*/
+				}
+				if (start == '{') {        //caso 2: si me encuentro con un objeto
 					sum++;
+					end = start + 1;
+					for (end; sum != 0; end++) {
+						if (s[end] == '{') {
+							sum++;
+						}
+						if (s[end] == '}') {
+							sum--;
+						}
+					}
 				}
-				if (s[i] == '{') {
-					sum--;
+				if (start == '[') {        //caso 3: si me encuentro con un array
+					sum++;
+					end = start + 1;
+					for (end; sum != 0; end++) {
+						if (s[end] == '[') {
+							sum++;
+						}
+						if (s[end] == ']') {
+							sum--;
+						}
+					}
 				}
-				if (sum != 0) {
-					tosave.push_back(s[i]);
+				else {
+					end = s.find_first_of(",{");     //caso 4: si me encuentro con cualquier otra cosa
 				}
-				else if (sum == 0) {
-					fields[counter].setContent(tosave);
-					state = DONE;
-				}
-
+				fields[counter].setContent(s.substr(start, end));
+				i = end + 1;
+				saved = true;
 			}
-					 break;
-			case DONE: {if (s[i] == '"') {
-				state = NEWFIELD;
-			}
-			}
-					   break;
-			}
-			i++;
 		}
 	}
 
