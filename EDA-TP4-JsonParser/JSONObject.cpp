@@ -85,7 +85,7 @@ JSONObject::JSONObject(const char * s)
 {
 	string to_app;
 	to_app.append(s);
-	JSONObject(s);
+	JSONObject(to_app);
 
 }
 
