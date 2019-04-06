@@ -41,7 +41,13 @@ JSONObject::parseFields(string& s) {
 				if (start == '"') {           //caso 1: si me encuentro con un string 
 					start++;
 					end = s.find_first_of('"', start);
-					/*int check=s.find_first_of("\"); no me deja escapar la barra invertida*/
+					int check = s.find_first_of('\ ', start);  //las comillas no pueden estar escapadas por la barra
+					while (check == end - 1)
+					{
+						end + 1;
+						end = s.find_first_of('"', end);
+						check = s.find_first_of('\ ', start);
+					}
 				}
 				else if (start == '{') {        //caso 2: si me encuentro con un objeto
 					sum++;
