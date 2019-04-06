@@ -12,8 +12,8 @@ public:
 		content = string(NULL);
 	}
 
-	void setFieldName(string& n);
-	void setContent(string& c);
+	void setFieldName(string n);
+	void setContent(string c);
 	void setFieldType(const char* t);
 	const char* getFieldType();
 	string getFieldName();
