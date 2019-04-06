@@ -4,7 +4,7 @@
 #include <cctype>
 #include <iostream>;
 #define INITIALSIZE 100
-
+using namespace std;
 //#define MARKERS "{[\"tfn-0123456789" // Todos los posibles primeros caracteres de un json value
 
 JSONObject::JSONObject(void){}
@@ -270,20 +270,7 @@ JSONObject::isFieldPresent(const char* f)
 	return found;
 }
 
-/* Devuelve en su nombre el tamaño del campo f, donde por tamaño se
-	* entiende:
-	* si f es de tipo "object" la cantidad de campos que tiene el objeto
-	* (pensar si en este caso conviene generar un JSONObject temporal) con
-	* el contenido del campo f y devolver getFieldCount de dicho objeto).
-	* si f es de tipo "array" devuelve la cantidad de elementos en el
-	* arreglo.
-	* si f es de tipo "string" devuelve la cantidad de caracteres en el
-	* string.
-	* si f es de tipo "number" devuelve sizeof(double).
-	* si f es de tipo "bool" devuelve sizeof(bool).
-	* si f es no pertenece al objeto devuelve 0. En este último caso genera
-	* un error que almacena internamente
-	*/
+
 unsigned int
 JSONObject::getFieldSize(const char * f)
 {
@@ -390,4 +377,17 @@ JSONObject::getFieldSize(const char * f)
 		}
 	}
 	return size;
+}
+
+void
+JSONObject::print(void)
+{
+	cout << "Start of JSON object" << endl;
+	cout << "FIELD" << "\t:\t" << "TYPE" << endl;
+	cout << "---------------" << endl;
+	for (int i = 0; i < fieldCount; i++)
+	{
+		cout << fields[i].getFieldName() << "\t:\t" << fields[i].getFieldType << endl;
+	}
+	cout << "End of JSON object" << endl;
 }
