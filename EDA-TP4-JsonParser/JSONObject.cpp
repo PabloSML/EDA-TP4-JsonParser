@@ -264,7 +264,7 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 			else if (fields[i].getFieldType() == string("array"))
 			{
 				string type = string(getArrayType(f));
-
+				if(type == string("object"))
 			}
 			else if (fields[i].getFieldType() == string("string"))
 			{
@@ -276,7 +276,10 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 			}
 			else if (fields[i].getFieldType() == string("bool"))
 			{
-
+				if (fields[i].getContent() == string("true"))
+					copy = new bool(true);
+				else
+					copy = new bool(false);
 			}
 		}
 	}
