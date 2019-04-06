@@ -31,11 +31,12 @@ JSONObject::parseFields(string& s) {
 		int sum = 0;
 		enum states { INITIAL, NEWFIELD, FIELDNAME, FIELDCONTENT, NEWCONTENT, DONE };
 		states state = INITIAL;
-		while(i<s.length){
+		while(i < s.find_last_of('}'))
+		{
 			switch (state) {
 			case INITIAL: 
 			{ 
-				if (s[i] == '"') 
+				if (s[i] == '\"') 
 				{
 				state = NEWFIELD;
 				}
@@ -92,7 +93,7 @@ JSONObject::parseFields(string& s) {
 				break;
 			case DONE: 
 			{
-				if (s[i] == '"') 
+				if (s[i] == '\"') 
 				{
 					state = NEWFIELD;
 				}
