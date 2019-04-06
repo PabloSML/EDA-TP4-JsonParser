@@ -26,83 +26,55 @@ void
 JSONObject::parseFields(string& s) {
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
 		fieldCount = howManyFields(s);
-		fields = new Field[fieldCount];
-		int counter = 0;
 		int i = 0;
-		string tosave;
-		int sum = 0;
-		enum states { INITIAL, NEWFIELD, FIELDNAME, FIELDCONTENT, NEWCONTENT, DONE };
-		states state = INITIAL;
-		while(i < s.find_last_of('}'))
-		{
-			switch (state) {
-			case INITIAL: 
-			{ 
-				if (s[i] == '\"') 
-				{
-				state = NEWFIELD;
+		for (int counter = 0; counter < fieldCount; counter++) {
+			bool saved = false;
+			int sum = 0;
+			int aux = s.find_first_of('"', i);  //guardo el name
+			i = aux + 1;
+			aux = s.find_first_of('"', i);
+			fields[counter].setFieldName(s.substr(i, aux + 1));
+			i = aux + 1;
+			i = s.find_first_not_of(': ', i);
+			while (!saved) {     //quiero guardar el content segun que es:objeto array string o cualquier otra cosa
+				int start = i;
+				int end;
+				if (start == '"') {           //caso 1: si me encuentro con un string 
+					start++;
+					end = s.find_first_of('"', start);
+					/*int check=s.find_first_of("\"); no me deja escapar la barra invertida*/
 				}
-			}
-				break;
-			case NEWFIELD: 
-			{
-				counter++;
-				tosave = "";
-				tosave.push_back(s[i]);
-				state = FIELDNAME;
-			}
-				break;
-			case FIELDNAME: 
-			{
-				if (s[i] != '"') 
-				{
-					tosave.push_back(s[i]);
-				}
-				else
-				{
-					fields[counter].setFieldName(tosave);
-					state = NEWCONTENT;
-				}
-			}
-				break;
-			case NEWCONTENT: 
-			{ 
-				if (s[i] == '{') 
-				{
-					tosave = "";
+				if (start == '{') {        //caso 2: si me encuentro con un objeto
 					sum++;
-					state = FIELDCONTENT;
-			    }
-			}
-				break;
-			case FIELDCONTENT: 
-			{
-				if (s[i] == '{') {
+					end = start + 1;
+					for (end; sum != 0; end++) {
+						if (s[end] == '{') {
+							sum++;
+						}
+						if (s[end] == '}') {
+							sum--;
+						}
+					}
+				}
+				if (start == '[') {        //caso 3: si me encuentro con un array
 					sum++;
+					end = start + 1;
+					for (end; sum != 0; end++) {
+						if (s[end] == '[') {
+							sum++;
+						}
+						if (s[end] == ']') {
+							sum--;
+						}
+					}
 				}
-				else if (s[i] == '}') {
-					sum--;
+				else {
+					end = s.find_first_of(",{");     //caso 4: si me encuentro con cualquier otra cosa
 				}
-				if (sum != 0) {
-					tosave.push_back(s[i]);
-				}
-				else if (sum == 0) {
-					fields[counter].setContent(tosave);
-					state = DONE;
-				}
-
+				fields[counter].setContent(s.substr(start, end));
+				i = end + 1;
+				saved = true;
 			}
-				break;
-			case DONE: 
-			{
-				if (s[i] == '\"') 
-				{
-					state = NEWFIELD;
-				}
-			}
-				break;
-			}
-			i++;
 		}
 	}
 
@@ -255,23 +227,24 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 
 		if (found)
 		{
-			void* newJSON;
+			void* copy;
 			i--;
 			if (fields[i].getFieldType() == string("object"))
 			{
-				newJSON = new JSONObject(fields[i].getContent());
+				copy = new JSONObject(fields[i].getContent());
 			}
 			else if (fields[i].getFieldType() == string("array"))
 			{
-				newJSON = new 
+				string type = string(getArrayType(f));
+
 			}
 			else if (fields[i].getFieldType() == string("string"))
 			{
-
+				copy = new string(fields[i].getContent());
 			}
 			else if (fields[i].getFieldType() == string("number"))
 			{
-				newJSON = new double(stod(fields[i].getContent()));
+				copy = new double(stod(fields[i].getContent()));
 			}
 			else if (fields[i].getFieldType() == string("bool"))
 			{
