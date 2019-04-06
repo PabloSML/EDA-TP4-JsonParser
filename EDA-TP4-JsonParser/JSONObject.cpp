@@ -4,7 +4,7 @@
 #include <cctype>
 #include <iostream>;
 #define INITIALSIZE 100
-
+using namespace std;
 //#define MARKERS "{[\"tfn-0123456789" // Todos los posibles primeros caracteres de un json value
 
 JSONObject::JSONObject(void){}
@@ -26,83 +26,55 @@ void
 JSONObject::parseFields(string& s) {
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
 		fieldCount = howManyFields(s);
-		fields = new Field[fieldCount];
-		int counter = 0;
 		int i = 0;
-		string tosave;
-		int sum = 0;
-		enum states { INITIAL, NEWFIELD, FIELDNAME, FIELDCONTENT, NEWCONTENT, DONE };
-		states state = INITIAL;
-		while(i < s.find_last_of('}'))
-		{
-			switch (state) {
-			case INITIAL: 
-			{ 
-				if (s[i] == '\"') 
-				{
-				state = NEWFIELD;
+		for (int counter = 0; counter < fieldCount; counter++) {
+			bool saved = false;
+			int sum = 0;
+			int aux = s.find_first_of('"', i);  //guardo el name
+			i = aux + 1;
+			aux = s.find_first_of('"', i);
+			fields[counter].setFieldName(s.substr(i, aux + 1));
+			i = aux + 1;
+			i = s.find_first_not_of(': ', i);
+			while (!saved) {     //quiero guardar el content segun que es:objeto array string o cualquier otra cosa
+				int start = i;
+				int end;
+				if (start == '"') {           //caso 1: si me encuentro con un string 
+					start++;
+					end = s.find_first_of('"', start);
+					/*int check=s.find_first_of("\"); no me deja escapar la barra invertida*/
 				}
-			}
-				break;
-			case NEWFIELD: 
-			{
-				counter++;
-				tosave = "";
-				tosave.push_back(s[i]);
-				state = FIELDNAME;
-			}
-				break;
-			case FIELDNAME: 
-			{
-				if (s[i] != '"') 
-				{
-					tosave.push_back(s[i]);
-				}
-				else
-				{
-					fields[counter].setFieldName(tosave);
-					state = NEWCONTENT;
-				}
-			}
-				break;
-			case NEWCONTENT: 
-			{ 
-				if (s[i] == '{') 
-				{
-					tosave = "";
+				if (start == '{') {        //caso 2: si me encuentro con un objeto
 					sum++;
-					state = FIELDCONTENT;
-			    }
-			}
-				break;
-			case FIELDCONTENT: 
-			{
-				if (s[i] == '{') {
+					end = start + 1;
+					for (end; sum != 0; end++) {
+						if (s[end] == '{') {
+							sum++;
+						}
+						if (s[end] == '}') {
+							sum--;
+						}
+					}
+				}
+				if (start == '[') {        //caso 3: si me encuentro con un array
 					sum++;
+					end = start + 1;
+					for (end; sum != 0; end++) {
+						if (s[end] == '[') {
+							sum++;
+						}
+						if (s[end] == ']') {
+							sum--;
+						}
+					}
 				}
-				else if (s[i] == '}') {
-					sum--;
+				else {
+					end = s.find_first_of(",{");     //caso 4: si me encuentro con cualquier otra cosa
 				}
-				if (sum != 0) {
-					tosave.push_back(s[i]);
-				}
-				else if (sum == 0) {
-					fields[counter].setContent(tosave);
-					state = DONE;
-				}
-
+				fields[counter].setContent(s.substr(start, end));
+				i = end + 1;
+				saved = true;
 			}
-				break;
-			case DONE: 
-			{
-				if (s[i] == '\"') 
-				{
-					state = NEWFIELD;
-				}
-			}
-				break;
-			}
-			i++;
 		}
 	}
 
@@ -301,20 +273,7 @@ JSONObject::isFieldPresent(const char* f)
 	return found;
 }
 
-/* Devuelve en su nombre el tamaño del campo f, donde por tamaño se
-	* entiende:
-	* si f es de tipo "object" la cantidad de campos que tiene el objeto
-	* (pensar si en este caso conviene generar un JSONObject temporal) con
-	* el contenido del campo f y devolver getFieldCount de dicho objeto).
-	* si f es de tipo "array" devuelve la cantidad de elementos en el
-	* arreglo.
-	* si f es de tipo "string" devuelve la cantidad de caracteres en el
-	* string.
-	* si f es de tipo "number" devuelve sizeof(double).
-	* si f es de tipo "bool" devuelve sizeof(bool).
-	* si f es no pertenece al objeto devuelve 0. En este último caso genera
-	* un error que almacena internamente
-	*/
+
 unsigned int
 JSONObject::getFieldSize(const char * f)
 {
@@ -421,4 +380,17 @@ JSONObject::getFieldSize(const char * f)
 		}
 	}
 	return size;
+}
+
+void
+JSONObject::print(void)
+{
+	cout << "Start of JSON object" << endl;
+	cout << "FIELD" << "\t:\t" << "TYPE" << endl;
+	cout << "---------------" << endl;
+	for (int i = 0; i < fieldCount; i++)
+	{
+		cout << fields[i].getFieldName() << "\t:\t" << fields[i].getFieldType << endl;
+	}
+	cout << "End of JSON object" << endl;
 }
