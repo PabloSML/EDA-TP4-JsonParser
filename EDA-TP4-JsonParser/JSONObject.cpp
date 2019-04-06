@@ -10,8 +10,10 @@ JSONObject::JSONObject(void){}
 JSONObject::JSONObject(string& s)
 {
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
-		cantFields = 0;
-		string tosave; //realocar vector de fields?
+		fieldCount = howManyFields(s);
+		fields = new Fields[fieldCount];
+		counter = 0;
+		string tosave; 
 		int sum=0; 
 		enum states {INITIAL, NEWFIELD, FIELDNAME, FIELDCONTENT, NEWCONTENT, DONE};
 		string::iterator iter;
@@ -25,7 +27,7 @@ JSONObject::JSONObject(string& s)
 				}
 							  break;
 				case NEWFIELD: {
-					cantFields++;
+					counter++;
 					tosave = "";
 					tosave.push_back(*iter);
 					state = FIELDNAME;
@@ -68,7 +70,6 @@ JSONObject::JSONObject(string& s)
 				case DONE: {if (*iter == '"') {
 					state = NEWFIELD;
 				}
-
 				}
 						   break;
 				}
@@ -86,6 +87,10 @@ JSONObject::JSONObject(const char * s)
 	to_app.append(s);
 	JSONObject(s);
 
+}
+
+JSONObject::getFieldCount() {
+	return fieldCount;
 }
 
 const char * 
@@ -123,6 +128,44 @@ JSONObject::getFieldType(const char * f)
 
 	return type;
 }
+
+int JSSONObject::howManyFields(string& s) {
+	int fields = 0;
+	int sum = 0;
+	string::iterator iter;
+	iter = s.begin();
+	enum states { START, SEARCHING, FOUNDANDSKIP};
+	states state = START;
+	while (iter != s.end()) {
+		switch (state)
+		{
+		case START: if (*iter == ':') {
+			fields++;
+			state = FOUNDANDSKIP;
+		}
+					break;
+		case FOUNDANDSKIP: { if (*iter == '{') {
+			sum++;
+		}
+						   if (*iter == '}') {
+							   sum--;
+						   }
+						   if (sum == 0) {
+							   state = SEARCHING;
+						   }
+		}
+						   break;
+		case SEARCHING: { if (*iter == ',') {
+			              state = START;
+						}
+		}
+						break;
+		}
+		iter++;
+	}
+	return fields;
+}
+
 
 const char*
 JSONObject::getArrayType(const char* f)
