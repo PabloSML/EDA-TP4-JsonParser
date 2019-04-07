@@ -312,9 +312,11 @@ JSONObject::getFieldSize(const char * f)
 					{
 						for (int a = 0; a < fields[i].getContent().length; a++)
 						{
-							if (fields[i].getContent()[a] == '"')
+							if (fields[i].getContent()[a] == '\"')
 							{
+							
 								cont++;
+							
 							}
 						}
 						return cont / 2;
@@ -401,4 +403,169 @@ JSONObject::isEmpty(void)
 	{
 		return false;
 	}
+}
+
+void*
+JSONObject::copyArrayValue(const char* f, unsigned int pos)
+{
+	void* copy=NULL;
+	if (isFieldPresent(f))
+	{
+		if (pos <= getFieldSize(f))
+		{
+			for (int i = 0; i < fieldCount; i++)
+			{
+				if (fields[i].getFieldName() == f)
+				{
+					string contenido = fields[i].getContent();
+					string valor = string(NULL);
+					if (!strcmp(getArrayType(f), "object"))
+					{
+						int comas = 0, cont = 0;
+						for (int b = 1; b < (contenido.length - 1); i++)
+						{
+							if (contenido[b] == '{')
+							{
+								cont++;
+							}
+							else if (contenido[b] == '}')
+							{
+								cont--;
+								b++;
+								if (cont == 0)
+								{
+									comas++;
+								}
+							}
+
+							if (comas == pos)
+							{
+								b++;
+								for (; contenido[b] != ',' || b < contenido.length; b++)
+								{
+									valor.push_back(contenido[b]);
+								}
+							}
+						}
+						JSONObject* obj = new JSONObject(valor);
+						copy = obj;
+					}
+					if (!strcmp(getArrayType(f), "number"))
+					{
+						int comas = 0;
+						for (int b = 0; b < contenido.length; i++)
+						{
+							if (contenido[b] == ',')
+							{
+								comas++;
+							}
+							if (comas == pos)
+							{
+								b++;
+								for (; contenido[b] != ',' || b < contenido.length; b++)
+								{
+									valor.push_back(contenido[b]);
+								}
+							}
+						}
+						double* num = new double(stod(valor));
+						copy = num;
+					}
+					if (!strcmp(getArrayType(f), "bool"))
+					{
+						int comas = 0;
+						bool* tof=NULL;
+						for (int b = 0; b < contenido.length; i++)
+						{
+							if (contenido[b] == ',')
+							{
+								comas++;
+							}
+							if (comas == pos)
+							{
+								b++;
+								for (; contenido[b] != ',' || b < contenido.length; b++)
+								{
+									valor.push_back(contenido[b]);
+								}
+							}
+						}
+						if (valor == "false" || valor == "0")
+						{
+							tof = new bool(false);
+						}
+						else if (valor == "true" || valor == "1")
+						{
+							tof = new bool(true);
+						}
+						copy = tof;
+					}
+					if (!strcmp(getArrayType(f), "string"))
+					{
+						int comas = 0, cont = 0;
+						for (int b = 0; b < contenido.length; i++)
+						{
+							if (contenido[b] == '\"')
+							{
+								if (cont == 0)
+								{
+									cont++;
+								}
+								else
+								{
+									cont--;
+									comas++;
+									b++;
+								}
+							}
+							if (comas == pos)
+							{
+								b+=2;
+								for (; contenido[b] != '\"' || b < contenido.length; b++)
+								{
+									valor.push_back(contenido[b]);
+								}
+							}
+						}
+						copy = &valor;
+					}
+					if (!strcmp(getArrayType(f), "array"))
+					{
+						int comas = 0, cont = 0;
+						for (int b = 1; b < (contenido.length-1); i++)
+						{
+							if (contenido[b] == '[')
+							{
+								cont++;
+							}
+							else if(contenido[b] == ']')
+							{
+								cont--;
+								b++;
+								if (cont == 0)
+								{
+									comas++;
+								}
+							}
+							
+							if (comas == pos)
+							{
+								b++;
+								for (; contenido[b] != ',' || b < (contenido.length-1); b++)
+								{
+									valor.push_back(contenido[b]);
+								}
+							}
+						}
+						Field* arreglo = new Field;
+						arreglo->setFieldName(string("ArrayValueCopy"));
+						arreglo->setContent(valor);
+						arreglo->setFieldType(getArrayType("ArrayValueCopy"));
+						copy = arreglo;
+					}
+				}
+			}
+		}
+	}
+	return copy;
 }
