@@ -11,6 +11,7 @@ using namespace std;
 JSONObject::JSONObject(void){}
 
 JSONObject::JSONObject(string& s){
+	unparsed = s;
 	parseFields(s);
 }
 
@@ -18,8 +19,8 @@ JSONObject::JSONObject(const char * s)
 {
 	string to_app;
 	to_app.append(s);
+	unparsed = to_app;
 	parseFields(to_app);
-
 }
 
 void
@@ -91,7 +92,11 @@ JSONObject::getFieldCount() {
 	return fieldCount;
 }
 
-
+string 
+JSONObject::getUnparsed(void)
+{
+	return unparsed;
+}
 
 const char * JSONObject::getFieldType(const char * f)
 {
@@ -255,9 +260,15 @@ JSONObject::copyField(const char* f)
 					for (int j = 0; j < size; j++)
 					{
 						JSONObject* temp = (JSONObject*)copyArrayValue(f, j);
-						string tempContent = 
-						
+						string tempContent = temp->getUnparsed();
+						newObjectArr[j].parseString(tempContent);
+						delete temp;
 					}
+					copy = newObjectArr;
+				}
+				else if (type == string("array"))
+				{
+
 				}
 				else if (type == string("string"))
 				{
