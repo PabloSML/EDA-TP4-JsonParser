@@ -41,7 +41,14 @@ JSONObject::parseFields(string& s) {
 				if (start == '"') {           //caso 1: si me encuentro con un string 
 					start++;
 					end = s.find_first_of('"', start);
-					/*int check=s.find_first_of("\"); no me deja escapar la barra invertida*/
+					int check = s.find_first_of(R"(\)", start);  //las comillas no pueden estar escapadas por la barra
+					while (check == end - 1)
+					{
+						aux=end + 1;
+						end = s.find_first_of('"', aux);
+						check = s.find_first_of(R"(\)", aux);
+
+					}
 				}
 				else if (start == '{') {        //caso 2: si me encuentro con un objeto
 					sum++;
@@ -221,7 +228,7 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 	bool found = false;
 	for (int i = 0; i < fieldCount && !found; i++)
 	{
-		found = fields[i].getFieldName() == f;
+		found = fields[i].getFieldName() == string(f);
 
 		if (found)
 		{
@@ -234,7 +241,24 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 			else if (fields[i].getFieldType() == string("array"))
 			{
 				string type = string(getArrayType(f));
+				unsigned int size = getFieldSize(f);
 
+				if (type == string("object"))
+				{
+					copy = new JSONObject[size];
+					for (int i = 0; i < size; i++)
+					{
+						
+					}
+				}
+				else if (type == string("bool"))
+				{
+					copy = new bool[size];
+					for (int i = 0; i < size; i++)
+					{
+						((bool*)copy)[i] = copyArrayValue(f, i);
+					}
+				}
 			}
 			else if (fields[i].getFieldType() == string("string"))
 			{
@@ -246,7 +270,10 @@ JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicim
 			}
 			else if (fields[i].getFieldType() == string("bool"))
 			{
-
+				if (fields[i].getContent() == string("true"))
+					copy = new bool(true);
+				else
+					copy = new bool(false);
 			}
 		}
 	}
