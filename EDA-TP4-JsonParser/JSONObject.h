@@ -219,5 +219,5 @@ private:
 	string unparsed;
 	bool ErrorCheck(string& s);
 	unsigned int howManyFields(string& s);
-	void parseFields(string& s);
+	bool parseFields(string& s);
 };

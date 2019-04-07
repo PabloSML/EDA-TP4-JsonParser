@@ -23,8 +23,10 @@ JSONObject::JSONObject(const char * s)
 	parseFields(to_app);
 }
 
-void
+bool
 JSONObject::parseFields(string& s) {
+	bool success = false;
+
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
 		fieldCount = howManyFields(s);
 		int i = 0;
@@ -83,8 +85,10 @@ JSONObject::parseFields(string& s) {
 				saved = true;
 			}
 		}
+		success = true;
 	}
 
+	return success;
 }
 
 unsigned int
@@ -478,6 +482,42 @@ JSONObject::print(void)
 	}
 	cout << "End of JSON object" << endl;
 }
+
+bool
+JSONObject::parseString(string& s)
+{
+	bool success = true;
+
+	if (parseFields(s) != true)
+	{
+		string errorDesc = string("There was an error filling the object with the data in buffer. parseString error");
+		err.setError(true);
+		err.setErrorString(errorDesc);
+		success = false;
+	}
+
+	return success;
+}
+
+bool
+JSONObject::parseString(const char* c)
+{
+	bool success = true;
+
+	string to_app;
+	to_app.append(c);
+
+	if (parseFields(to_app) != true)
+	{
+		string errorDesc = string("There was an error filling the object with the data in buffer. parseString error");
+		err.setError(true);
+		err.setErrorString(errorDesc);
+		success = false;
+	}
+
+	return success;
+}
+
 
 bool
 JSONObject::isEmpty(void)
