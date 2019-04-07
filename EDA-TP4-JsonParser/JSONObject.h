@@ -203,6 +203,10 @@ public:
 	* a una campo.
 	*/
 
+
+	/*Funciones de la FMS*/
+
+
 private:
 	unsigned long fieldCount;
 	Field* fields;

@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
+#define INVALID_CHAR "Invalid char: cannot start a JSON with"
 using namespace std;
 
 /* Clase que permite trasmitir errores generados al utilizar JSONObject

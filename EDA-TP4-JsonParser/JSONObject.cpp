@@ -4,6 +4,7 @@
 #include <cctype>
 #include <iostream>;
 #define INITIALSIZE 100
+
 using namespace std;
 //#define MARKERS "{[\"tfn-0123456789" // Todos los posibles primeros caracteres de un json value
 
@@ -89,6 +90,8 @@ unsigned int
 JSONObject::getFieldCount() {
 	return fieldCount;
 }
+
+
 
 const char * JSONObject::getFieldType(const char * f)
 {
