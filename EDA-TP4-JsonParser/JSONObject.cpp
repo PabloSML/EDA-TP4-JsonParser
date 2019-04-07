@@ -226,60 +226,106 @@ JSONObject::getArrayType(const char* f)
 }
 
 void*
-JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicimos en clase
+JSONObject::copyField(const char* f)
 {
 	bool found = false;
+	void* copy = NULL;
 	for (int i = 0; i < fieldCount && !found; i++)
 	{
 		found = fields[i].getFieldName() == string(f);
 
 		if (found)
 		{
-			void* copy;
 			i--;
 			if (fields[i].getFieldType() == string("object"))
 			{
-				copy = new JSONObject(fields[i].getContent());
+				string content = string(fields[i].getContent());
+				JSONObject* newObject = new JSONObject(content);
+				copy = newObject;
 			}
 			else if (fields[i].getFieldType() == string("array"))
 			{
 				string type = string(getArrayType(f));
+				string arrContent = string(fields[i].getContent());
 				unsigned int size = getFieldSize(f);
 
 				if (type == string("object"))
 				{
-					copy = new JSONObject[size];
-					for (int i = 0; i < size; i++)
+					JSONObject* newObjectArr = new JSONObject[size];
+					for (int j = 0; j < size; j++)
 					{
+						JSONObject* temp = (JSONObject*)copyArrayValue(f, j);
+						string tempContent = 
 						
 					}
 				}
+				else if (type == string("string"))
+				{
+					string* newStringArr = new string[size];
+					for (int j = 0; j < size; j++)
+					{
+						string* temp = (string*)copyArrayValue(f, j);
+						newStringArr[j] = *(temp);
+						delete temp;
+					}
+					copy = newStringArr;
+				}
+				else if (type == string("number"))
+				{
+					double* newDoubleArr = new double[size];
+					for (int j = 0; j < size; j++)
+					{
+						double* temp = (double*)copyArrayValue(f, j);
+						newDoubleArr[j] = *(temp);
+						delete temp;
+					}
+					copy = newDoubleArr;
+				}
 				else if (type == string("bool"))
 				{
-					copy = new bool[size];
-					for (int i = 0; i < size; i++)
+					bool* newBoolArr = new bool[size];
+					for (int j = 0; j < size; j++)
 					{
-						((bool*)copy)[i] = copyArrayValue(f, i);
+						bool* temp = (bool*)copyArrayValue(f, j);
+						newBoolArr[j] = *(temp);
+						delete temp;
 					}
+					copy = newBoolArr;
 				}
 			}
 			else if (fields[i].getFieldType() == string("string"))
 			{
-				copy = new string(fields[i].getContent());
+				string* newString = new string(fields[i].getContent());
+				copy = newString;
 			}
 			else if (fields[i].getFieldType() == string("number"))
 			{
-				copy = new double(stod(fields[i].getContent()));
+				double* newDouble = new double(stod(fields[i].getContent()));
+				copy = newDouble;
 			}
 			else if (fields[i].getFieldType() == string("bool"))
 			{
 				if (fields[i].getContent() == string("true"))
-					copy = new bool(true);
+				{
+					bool* newTrue = new bool(true);
+					copy = newTrue;
+				}
 				else
-					copy = new bool(false);
+				{
+					bool* newFalse = new bool(false);
+					copy = newFalse;
+				}
 			}
 		}
 	}
+	if (!found)
+	{
+		string errorDesc = string("The field name entered does not match current known fields. copyField Fail.");
+		err.setError(true);
+		err.setErrorString(errorDesc);
+	}
+
+	return copy;
 }
 
 bool
@@ -441,18 +487,18 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 	void* copy=NULL;
 	if (isFieldPresent(f))
 	{
-		if (pos <= getFieldSize(f))
+		if (pos < getFieldSize(f))
 		{
 			for (int i = 0; i < fieldCount; i++)
 			{
-				if (fields[i].getFieldName() == f)
+				if (fields[i].getFieldName() == string(f))
 				{
 					string contenido = fields[i].getContent();
 					string valor = string(NULL);
 					if (!strcmp(getArrayType(f), "object"))
 					{
 						int comas = 0, cont = 0;
-						for (int b = 1; b < (contenido.length - 1); i++)
+						for (int b = 1; b < (contenido.length - 1); b++)
 						{
 							if (contenido[b] == '{')
 							{
@@ -596,6 +642,19 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 				}
 			}
 		}
+		else
+		{
+			string errorDesc = string("The position entered is grater than the number of elements within the array. copyArrayValue Fail.");
+			err.setError(true);
+			err.setErrorString(errorDesc);
+		}
 	}
+	else
+	{
+		string errorDesc = string("The array name entered does not match current known arrays. copyArrayValue Fail.");
+		err.setError(true);
+		err.setErrorString(errorDesc);
+	}
+
 	return copy;
 }
