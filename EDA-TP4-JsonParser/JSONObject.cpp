@@ -12,7 +12,7 @@ JSONObject::JSONObject(void){}
 
 JSONObject::JSONObject(string& s){
 	unparsed = s;
-	parseFields(s);
+	parseInput(s);
 }
 
 JSONObject::JSONObject(const char * s)
@@ -20,11 +20,11 @@ JSONObject::JSONObject(const char * s)
 	string to_app;
 	to_app.append(s);
 	unparsed = to_app;
-	parseFields(to_app);
+	parseInput(to_app);
 }
 
 bool
-JSONObject::parseFields(string& s) {
+JSONObject::parseInput(string& s) {
 	bool success = false;
 
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
@@ -261,14 +261,25 @@ JSONObject::copyField(const char* f)
 				if (type == string("object"))
 				{
 					JSONObject* newObjectArr = new JSONObject[size];
-					for (int j = 0; j < size; j++)
+					bool end = false;
+
+					for (int j = 0; j < size && !end; j++)
 					{
 						JSONObject* temp = (JSONObject*)copyArrayValue(f, j);
 						string tempContent = temp->getUnparsed();
-						newObjectArr[j].parseString(tempContent);
+						if (!(newObjectArr[j].parseString(tempContent)))
+							end = true;
 						delete temp;
 					}
-					copy = newObjectArr;
+					if (end)
+					{
+						copy = NULL;
+						string errorDesc = string("There was an error copying an \"object\" type element in the array. copyField Fail.");
+						err.setError(true);
+						err.setErrorString(errorDesc);
+					}
+					else
+						copy = newObjectArr;
 				}
 				else if (type == string("array"))
 				{
@@ -488,7 +499,7 @@ JSONObject::parseString(string& s)
 {
 	bool success = true;
 
-	if (parseFields(s) != true)
+	if (parseInput(s) != true)
 	{
 		string errorDesc = string("There was an error filling the object with the data in buffer. parseString error");
 		err.setError(true);
@@ -507,7 +518,7 @@ JSONObject::parseString(const char* c)
 	string to_app;
 	to_app.append(c);
 
-	if (parseFields(to_app) != true)
+	if (parseInput(to_app) != true)
 	{
 		string errorDesc = string("There was an error filling the object with the data in buffer. parseString error");
 		err.setError(true);
