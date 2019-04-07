@@ -1,8 +1,7 @@
 #include <iostream>
-#include "FSMDigit.h"
+#include "FSMDigit.h" //incluye definicion de states
+#include "FSMDigitAux.h" //incluye la deficion de la estructura FMSCell
 #include "FMSCell.h"
-#define STATES 8
-#define EVENTS 7
 
 using namespace std;
 
