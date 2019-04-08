@@ -33,6 +33,9 @@
     <ClInclude Include="FSMObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FMSCell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JSONObject.cpp">

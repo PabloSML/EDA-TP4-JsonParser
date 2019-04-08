@@ -116,6 +116,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="field.h" />
+    <ClInclude Include="FMSCell.h" />
     <ClInclude Include="FSMDigit.h" />
     <ClInclude Include="FSMDigitAux.h" />
     <ClInclude Include="FSMObject.h" />
