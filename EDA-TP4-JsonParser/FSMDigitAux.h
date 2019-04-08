@@ -1,7 +1,7 @@
 #pragma once
 #include "JSONError.h"
-#define ERROR_STR "Number badly formed"
-#define STATES 8
+#define ERROR_NUM "Number badly formed"
+#define STATES 7
 #define EVENTS 7
 
 enum states { INITIAL, NEGATIVE, DIGIT, COMA, EXPOI, EXPONENT, ZERONOT, ERROR };

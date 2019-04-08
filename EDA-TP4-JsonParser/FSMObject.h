@@ -1,4 +1,6 @@
 #pragma once
 class FSMObject {
-	public cycle(string& s);
+public:
+	bool cycle(string& s);
+	
 };
