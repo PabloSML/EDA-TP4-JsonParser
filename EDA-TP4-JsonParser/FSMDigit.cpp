@@ -19,7 +19,7 @@ void FSMDigit::cycle(string& s) {
 	bool ok = true; //corta antes si el programa dio error
 	states state = INITIAL; 
 	events event_;
-	JSONError error_t(true, '');
+	JSONError error_t;
 	for (int i = 0; i < s.length() && ok; i++) {
 		if (isdigit(s[i]) && s[i] != '0') {
 			event_ = events::DIGITS;
@@ -52,6 +52,6 @@ void FSMDigit::cycle(string& s) {
 }
 
 bool error(void* UserData) {
-	((*JSONError)UserData)->setErrorString(ERROR_NUM);
+	((JSONError*)UserData)->setErrorString(ERROR_NUM);
 	return false;
 }
