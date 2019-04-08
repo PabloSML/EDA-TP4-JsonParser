@@ -52,6 +52,6 @@ void FSMDigit::cycle(string& s) {
 }
 
 bool error(void* UserData) {
-	((*JSONError)UserData)->setErrorString(ERROR_NUM);
+	((JSONError*)UserData)->setErrorString(ERROR_NUM);
 	return false;
 }
