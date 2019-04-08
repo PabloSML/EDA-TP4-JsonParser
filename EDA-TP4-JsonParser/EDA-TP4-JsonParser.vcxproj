@@ -116,11 +116,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="field.h" />
+    <ClInclude Include="FSMDigit.h" />
+    <ClInclude Include="FSMDigitAux.h" />
+    <ClInclude Include="FSMObject.h" />
     <ClInclude Include="JSONError.h" />
     <ClInclude Include="JSONObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="field.cpp" />
+    <ClCompile Include="FSMDigit.cpp" />
+    <ClCompile Include="FSMObject.cpp" />
     <ClCompile Include="JSONError.cpp" />
     <ClCompile Include="JSONObject.cpp" />
   </ItemGroup>

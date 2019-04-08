@@ -24,6 +24,15 @@
     <ClInclude Include="field.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FSMDigit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FSMDigitAux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FSMObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JSONObject.cpp">
@@ -33,6 +42,12 @@
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="field.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FSMDigit.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FSMObject.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>

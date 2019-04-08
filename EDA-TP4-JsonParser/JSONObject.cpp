@@ -102,7 +102,8 @@ JSONObject::getUnparsed(void)
 	return unparsed;
 }
 
-const char * JSONObject::getFieldType(const char * f)
+const char * 
+JSONObject::getFieldType(const char * f)
 {
 	bool found = false;
 	const char* type;
@@ -283,7 +284,14 @@ JSONObject::copyField(const char* f)
 				}
 				else if (type == string("array"))
 				{
-
+					string* newArrayArr = new string[size];
+					for (int j = 0; j < size; j++)
+					{
+						string* temp = (string*)copyArrayValue(f, j);
+						newArrayArr[j] = *(temp);
+						delete temp;
+					}
+					copy = newArrayArr;
 				}
 				else if (type == string("string"))
 				{
@@ -665,7 +673,8 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 								}
 							}
 						}
-						copy = &valor;
+						string* str = new string(valor);
+						copy = str;
 					}
 					if (!strcmp(getArrayType(f), "array"))
 					{
@@ -695,11 +704,8 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 								}
 							}
 						}
-						Field* arreglo = new Field;
-						arreglo->setFieldName(string("ArrayValueCopy"));
-						arreglo->setContent(valor);
-						arreglo->setFieldType(getArrayType("ArrayValueCopy"));
-						copy = arreglo;
+						string* arrStr = new string(valor);
+						copy = arrStr;
 					}
 				}
 			}
