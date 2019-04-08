@@ -591,7 +591,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					if (!strcmp(getArrayType(f), "number"))
 					{
 						int comas = 0;
-						for (int b = 0; b < contenido.length; i++)
+						for (int b = 0; b < contenido.length; b++)
 						{
 							if (contenido[b] == ',')
 							{
@@ -613,7 +613,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					{
 						int comas = 0;
 						bool* tof=NULL;
-						for (int b = 0; b < contenido.length; i++)
+						for (int b = 0; b < contenido.length; b++)
 						{
 							if (contenido[b] == ',')
 							{
@@ -641,7 +641,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					if (!strcmp(getArrayType(f), "string"))
 					{
 						int comas = 0, cont = 0;
-						for (int b = 0; b < contenido.length; i++)
+						for (int b = 0; b < contenido.length; b++)
 						{
 							if (contenido[b] == '\"')
 							{
@@ -670,7 +670,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					if (!strcmp(getArrayType(f), "array"))
 					{
 						int comas = 0, cont = 0;
-						for (int b = 1; b < (contenido.length-1); i++)
+						for (int b = 1; b < (contenido.length-1); b++)
 						{
 							if (contenido[b] == '[')
 							{
@@ -695,10 +695,11 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 								}
 							}
 						}
-						Field* arreglo = new Field;
-						arreglo->setFieldName(string("ArrayValueCopy"));
-						arreglo->setContent(valor);
-						arreglo->setFieldType(getArrayType("ArrayValueCopy"));
+						JSONObject* arreglo = new JSONObject;
+						arreglo->fieldCount = 1;
+						arreglo->fields[0].setContent(valor);
+						arreglo->fields[0].setFieldName(string("Array"+to_string(pos)+"ValueCopy"));
+						arreglo->fields[0].setFieldType("array");
 						copy = arreglo;
 					}
 				}
