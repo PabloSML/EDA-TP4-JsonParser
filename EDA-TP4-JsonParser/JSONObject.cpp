@@ -704,11 +704,8 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 								}
 							}
 						}
-						JSONObject* arreglo = new JSONObject;
-						arreglo->fieldCount = 1;
-						arreglo->fields[0].setContent(valor);
-						arreglo->fields[0].setFieldName(string("Array"+to_string(pos)+"ValueCopy"));
-						arreglo->fields[0].setFieldType("array");
+						string completo = "{\"Array" + to_string(pos) + "ValueCopy\":" + valor + "}";
+						JSONObject* arreglo = new JSONObject(completo);
 						copy = arreglo;
 					}
 				}
