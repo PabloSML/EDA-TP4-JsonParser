@@ -35,6 +35,11 @@ public:
 	unsigned int getFieldCount(void);
 
 
+	/* Devuelve en su nombre el string que se utilizo para incializar
+	el JSONObject */
+	string getUnparsed(void);
+
+
 	/* Devuelve en su nombre el tipo de campo de f. Los posibles tipos son
 	* (todos en minúscula):
 	* "object" si el campo f contiene un objeto JSON.
@@ -211,7 +216,8 @@ private:
 	unsigned long fieldCount;
 	Field* fields;
 	JSONError err;
+	string unparsed;
 	bool ErrorCheck(string& s);
 	unsigned int howManyFields(string& s);
-	void parseFields(string& s);
+	bool parseInput(string& s);
 };

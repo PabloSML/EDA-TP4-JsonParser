@@ -6,20 +6,22 @@
 using namespace std;
 
 void FSMDigit::cycle(string& s) {
-	 
-	const FMSCell FSMTable[STATES][EVENTS] = { {   {DIGIT, continueToDo},    {DIGIT, continueToDo}, {DIGIT, continueToDo}, {COMA, continueToDo}, {states::EXPONENT, continueToDo},  {EXPONENT, continueToDo}, {DIGIT, continueToDo} , {ERROR, error}  },
-												{  {ZERONOT, continueToDo},  {DIGIT, continueToDo}, {DIGIT, continueToDo}, {COMA, continueToDo}, {states::EXPONENT, continueToDo},  {EXPONENT, continueToDo}, {ERROR, error} , {ERROR, error}  },
-												{  {ERROR, error},           {ERROR, error},        {COMA, continueToDo},  {ERROR, error},       {ERROR, error},            {ERROR, error},			  {COMA, continueToDo}, {ERROR, error} },
-												{  {NEGATIVE, continueToDo}, {ERROR, error},        {ERROR, error},        {ERROR, error},       {states::EXPONENT, continueToDo},  {ERROR, error},           {ERROR, error}, {ERROR, error}   },
-												{  {ERROR, error},           {ERROR, error},        {EXPOI, continueToDo}, {EXPOI, continueToDo},{ERROR, error},			{ERROR, error},           {EXPOI, continueToDo}, {ERROR, error} },
-												{  {ERROR, error},           {ERROR, error},        {ERROR, error},        {ERROR, error},       {EXPONENT, continueToDo},  {ERROR, error},           {ERROR, error}, {ERROR, error}   },
-												{  {ERROR, error},           {ERROR, error},        {ERROR, error},        {ERROR, error},       {ERROR, error},			{ERROR, error},           {ERROR, error},  {ERROR, error}, } };
+
+	const FMSCell FSMTable[STATES][EVENTS] ={	{{states::DIGIT, continueToDo},		{states::DIGIT, continueToDo}, {states::DIGIT, continueToDo}, {states::COMA, continueToDo}, {states::EXPONENT, continueToDo},	{states::EXPONENT, continueToDo}, {states::DIGIT, continueToDo}},
+												{{states::ZERONOT, continueToDo},	{states::DIGIT, continueToDo}, {states::DIGIT, continueToDo}, {states::COMA, continueToDo}, {states::EXPONENT, continueToDo},	{states::EXPONENT, continueToDo}, {states::ERROR, error}},
+												{{states::ERROR, error},			{states::ERROR, error},        {states::COMA, continueToDo},  {states::ERROR, error},       {states::ERROR, error},				{states::ERROR, error},			  {states::COMA, continueToDo}},
+												{{states::NEGATIVE, continueToDo},	{states::ERROR, error},        {states::ERROR, error},        {states::ERROR, error},       {states::EXPONENT, continueToDo},	{states::ERROR, error},           {states::ERROR, error}},
+												{{states::ERROR, error},			{states::ERROR, error},        {states::EXPOI, continueToDo}, {states::EXPOI, continueToDo},{states::ERROR, error},				{states::ERROR, error},           {states::EXPOI, continueToDo}},
+												{{states::ERROR, error},			{states::ERROR, error},        {states::ERROR, error},        {states::ERROR, error},       {states::EXPONENT, continueToDo},	{states::ERROR, error},           {states::ERROR, error}},
+												{{states::ERROR, error},			{states::ERROR, error},        {states::ERROR, error},        {states::ERROR, error},       {states::ERROR, error},				{states::ERROR, error},           {states::ERROR, error}},
+											};
+	
 	bool ok = true; //corta antes si el programa dio error
 	states state = INITIAL; 
 	events event_;
 	JSONError error_t(true, '');
 	for (int i = 0; i < s.length() && ok; i++) {
-		if (isdigit(s[i]) && s[i] != 0) {
+		if (isdigit(s[i]) && s[i] != '0') {
 			event_ = events::DIGITS;
 		}
 		else if (s[i] == '0') {

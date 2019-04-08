@@ -11,19 +11,22 @@ using namespace std;
 JSONObject::JSONObject(void){}
 
 JSONObject::JSONObject(string& s){
-	parseFields(s);
+	unparsed = s;
+	parseInput(s);
 }
 
 JSONObject::JSONObject(const char * s)
 {
 	string to_app;
 	to_app.append(s);
-	parseFields(to_app);
-
+	unparsed = to_app;
+	parseInput(to_app);
 }
 
-void
-JSONObject::parseFields(string& s) {
+bool
+JSONObject::parseInput(string& s) {
+	bool success = false;
+
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
 		fieldCount = howManyFields(s);
 		int i = 0;
@@ -82,8 +85,10 @@ JSONObject::parseFields(string& s) {
 				saved = true;
 			}
 		}
+		success = true;
 	}
 
+	return success;
 }
 
 unsigned int
@@ -91,9 +96,14 @@ JSONObject::getFieldCount() {
 	return fieldCount;
 }
 
+string 
+JSONObject::getUnparsed(void)
+{
+	return unparsed;
+}
 
-
-const char * JSONObject::getFieldType(const char * f)
+const char * 
+JSONObject::getFieldType(const char * f)
 {
 	bool found = false;
 	const char* type;
@@ -226,60 +236,130 @@ JSONObject::getArrayType(const char* f)
 }
 
 void*
-JSONObject::copyField(const char* f)	//le falta todavia, solo copie lo que hicimos en clase
+JSONObject::copyField(const char* f)
 {
 	bool found = false;
+	void* copy = NULL;
 	for (int i = 0; i < fieldCount && !found; i++)
 	{
 		found = fields[i].getFieldName() == string(f);
 
 		if (found)
 		{
-			void* copy;
 			i--;
 			if (fields[i].getFieldType() == string("object"))
 			{
-				copy = new JSONObject(fields[i].getContent());
+				string content = string(fields[i].getContent());
+				JSONObject* newObject = new JSONObject(content);
+				copy = newObject;
 			}
 			else if (fields[i].getFieldType() == string("array"))
 			{
 				string type = string(getArrayType(f));
+				string arrContent = string(fields[i].getContent());
 				unsigned int size = getFieldSize(f);
 
 				if (type == string("object"))
 				{
-					copy = new JSONObject[size];
-					for (int i = 0; i < size; i++)
+					JSONObject* newObjectArr = new JSONObject[size];
+					bool end = false;
+
+					for (int j = 0; j < size && !end; j++)
 					{
-						
+						JSONObject* temp = (JSONObject*)copyArrayValue(f, j);
+						string tempContent = temp->getUnparsed();
+						if (!(newObjectArr[j].parseString(tempContent)))
+							end = true;
+						delete temp;
 					}
+					if (end)
+					{
+						copy = NULL;
+						string errorDesc = string("There was an error copying an \"object\" type element in the array. copyField Fail.");
+						err.setError(true);
+						err.setErrorString(errorDesc);
+					}
+					else
+						copy = newObjectArr;
+				}
+				else if (type == string("array"))
+				{
+					string* newArrayArr = new string[size];
+					for (int j = 0; j < size; j++)
+					{
+						string* temp = (string*)copyArrayValue(f, j);
+						newArrayArr[j] = *(temp);
+						delete temp;
+					}
+					copy = newArrayArr;
+				}
+				else if (type == string("string"))
+				{
+					string* newStringArr = new string[size];
+					for (int j = 0; j < size; j++)
+					{
+						string* temp = (string*)copyArrayValue(f, j);
+						newStringArr[j] = *(temp);
+						delete temp;
+					}
+					copy = newStringArr;
+				}
+				else if (type == string("number"))
+				{
+					double* newDoubleArr = new double[size];
+					for (int j = 0; j < size; j++)
+					{
+						double* temp = (double*)copyArrayValue(f, j);
+						newDoubleArr[j] = *(temp);
+						delete temp;
+					}
+					copy = newDoubleArr;
 				}
 				else if (type == string("bool"))
 				{
-					copy = new bool[size];
-					for (int i = 0; i < size; i++)
+					bool* newBoolArr = new bool[size];
+					for (int j = 0; j < size; j++)
 					{
-						((bool*)copy)[i] = copyArrayValue(f, i);
+						bool* temp = (bool*)copyArrayValue(f, j);
+						newBoolArr[j] = *(temp);
+						delete temp;
 					}
+					copy = newBoolArr;
 				}
 			}
 			else if (fields[i].getFieldType() == string("string"))
 			{
-				copy = new string(fields[i].getContent());
+				string* newString = new string(fields[i].getContent());
+				copy = newString;
 			}
 			else if (fields[i].getFieldType() == string("number"))
 			{
-				copy = new double(stod(fields[i].getContent()));
+				double* newDouble = new double(stod(fields[i].getContent()));
+				copy = newDouble;
 			}
 			else if (fields[i].getFieldType() == string("bool"))
 			{
 				if (fields[i].getContent() == string("true"))
-					copy = new bool(true);
+				{
+					bool* newTrue = new bool(true);
+					copy = newTrue;
+				}
 				else
-					copy = new bool(false);
+				{
+					bool* newFalse = new bool(false);
+					copy = newFalse;
+				}
 			}
 		}
 	}
+	if (!found)
+	{
+		string errorDesc = string("The field name entered does not match current known fields. copyField Fail.");
+		err.setError(true);
+		err.setErrorString(errorDesc);
+	}
+
+	return copy;
 }
 
 bool
@@ -423,6 +503,42 @@ JSONObject::print(void)
 }
 
 bool
+JSONObject::parseString(string& s)
+{
+	bool success = true;
+
+	if (parseInput(s) != true)
+	{
+		string errorDesc = string("There was an error filling the object with the data in buffer. parseString error");
+		err.setError(true);
+		err.setErrorString(errorDesc);
+		success = false;
+	}
+
+	return success;
+}
+
+bool
+JSONObject::parseString(const char* c)
+{
+	bool success = true;
+
+	string to_app;
+	to_app.append(c);
+
+	if (parseInput(to_app) != true)
+	{
+		string errorDesc = string("There was an error filling the object with the data in buffer. parseString error");
+		err.setError(true);
+		err.setErrorString(errorDesc);
+		success = false;
+	}
+
+	return success;
+}
+
+
+bool
 JSONObject::isEmpty(void)
 {
 	if (fieldCount == 0)
@@ -441,18 +557,18 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 	void* copy=NULL;
 	if (isFieldPresent(f))
 	{
-		if (pos <= getFieldSize(f))
+		if (pos < getFieldSize(f))
 		{
 			for (int i = 0; i < fieldCount; i++)
 			{
-				if (fields[i].getFieldName() == f)
+				if (fields[i].getFieldName() == string(f))
 				{
 					string contenido = fields[i].getContent();
 					string valor = string(NULL);
 					if (!strcmp(getArrayType(f), "object"))
 					{
 						int comas = 0, cont = 0;
-						for (int b = 1; b < (contenido.length - 1); i++)
+						for (int b = 1; b < (contenido.length - 1); b++)
 						{
 							if (contenido[b] == '{')
 							{
@@ -557,7 +673,8 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 								}
 							}
 						}
-						copy = &valor;
+						string* str = new string(valor);
+						copy = str;
 					}
 					if (!strcmp(getArrayType(f), "array"))
 					{
@@ -587,15 +704,25 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 								}
 							}
 						}
-						Field* arreglo = new Field;
-						arreglo->setFieldName(string("ArrayValueCopy"));
-						arreglo->setContent(valor);
-						arreglo->setFieldType(getArrayType("ArrayValueCopy"));
-						copy = arreglo;
+						string* arrStr = new string(valor);
+						copy = arrStr;
 					}
 				}
 			}
 		}
+		else
+		{
+			string errorDesc = string("The position entered is grater than the number of elements within the array. copyArrayValue Fail.");
+			err.setError(true);
+			err.setErrorString(errorDesc);
+		}
 	}
+	else
+	{
+		string errorDesc = string("The array name entered does not match current known arrays. copyArrayValue Fail.");
+		err.setError(true);
+		err.setErrorString(errorDesc);
+	}
+
 	return copy;
 }
