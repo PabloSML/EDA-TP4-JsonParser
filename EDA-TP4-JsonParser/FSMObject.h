@@ -1,10 +1,14 @@
 #pragma once
+#include "FSMObjectAux.h"
 class FSMObject {
 public:
 	FSMObject(string& s, JSONError* err, int *i);
-	void cycle(string& s);
+	void cycle(eventsob ev);
+	eventsob getEvent(char s);
+	statesob getState();
 private: 
+	statesob currentState;
 	string s;
-	J
-	
+	JSONError* err;
+	int *index;
 };

@@ -5,6 +5,7 @@
 typedef struct {
 	states nextState;
 	bool(*action)(void* UserData);
+
 }FMSCell;
 
 
