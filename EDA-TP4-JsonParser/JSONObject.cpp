@@ -51,7 +51,8 @@ JSONObject::parseInput(string& s) {
 			while (!saved) {     //quiero guardar el content segun que es:objeto array string o cualquier otra cosa
 				int start = i;
 				int end=start+1;
-				if (s[start] == '"') {           //caso 1: si me encuentro con un string 
+				if (s[start] == '"') {           //caso 1: si me encuentro con un string
+					fields[counter].setFieldType("string");
 					start++;
 					end = s.find_first_of('"', start);
 					int check = s.find_first_of(R"(\)", start);  //las comillas no pueden estar escapadas por la barra
@@ -64,6 +65,7 @@ JSONObject::parseInput(string& s) {
 					}
 				}
 				else if (s[start] == '{') {        //caso 2: si me encuentro con un objeto
+					fields[counter].setFieldType("object");
 					sum++;
 					end = start + 1;
 					for (end; sum != 0; end++) {
@@ -76,6 +78,7 @@ JSONObject::parseInput(string& s) {
 					}
 				}
 				else if (s[start] == '[') {        //caso 3: si me encuentro con un array
+					fields[counter].setFieldType("array");
 					sum++;
 					for (end; sum != 0; end++) {
 						if (s[end] == '[') {
@@ -123,7 +126,6 @@ JSONObject::getFieldType(const char * f)
 
 		if (found)
 		{
-			i--;
 			if (fields[i].getFieldType() == string("object"))
 				type = "object";
 			else if (fields[i].getFieldType() == string("array"))
@@ -213,7 +215,6 @@ JSONObject::getArrayType(const char* f)
 
 		if (found)
 		{
-			i--;
 			if (string(fields[i].getFieldType()) == string("array"))
 			{
 				string content = fields[i].getContent();
@@ -253,7 +254,6 @@ JSONObject::copyField(const char* f)
 
 		if (found)
 		{
-			i--;
 			if (fields[i].getFieldType() == string("object"))
 			{
 				string content = string(fields[i].getContent());
@@ -511,13 +511,13 @@ void
 JSONObject::print(void)
 {
 	cout << "Start of JSON object" << endl;
-	cout << "FIELD" << "\t:\t" << "TYPE" << endl;
+	cout << "FIELD" << "  :  " << "TYPE" << endl;
 	cout << "---------------" << endl;
 	for (int i = 0; i < fieldCount; i++)
 	{
-		cout << fields[i].getFieldName() << "\t:\t" << fields[i].getFieldType() << endl;
+		cout << fields[i].getFieldName() << " : " << fields[i].getFieldType() << endl;
 	}
-	cout << "End of JSON object" << endl;
+	cout << endl << "End of JSON object" << endl;
 }
 
 bool
