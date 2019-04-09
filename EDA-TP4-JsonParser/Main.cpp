@@ -31,17 +31,23 @@ int main(void)
 
 		// A partir de aca son pruebas arbitrarias que estoy haciendo
 		JSONObject original(json);
-		JSONObject empty;
-		cout << "por ahora bien" << endl;
-		cout << "esta vacio?" << empty.isEmpty() << endl;
-		cout << original.getFieldType("glossary") << endl;
-		cout << original.getFieldSize("glossary") << endl;
-		empty.parseString(json);
-		cout << "esta vacio?" << empty.isEmpty() << endl;
 		JSONObject* glossaryCopy = (JSONObject*)original.copyField("glossary");
+		JSONObject* glosdivCopy = (JSONObject*)glossaryCopy->copyField("GlossDiv");
+		JSONObject* gloslistCpy = (JSONObject*)glosdivCopy->copyField("GlossList");
+		JSONObject* glosentryCpy = (JSONObject*)gloslistCpy->copyField("GlossEntry");
+		JSONObject* glosdefCpy = (JSONObject*)glosentryCpy->copyField("GlossDef");
+
 		original.print();
-		empty.print();
+		cout << endl;
 		glossaryCopy->print();
+		cout << endl;
+		glosdivCopy->print();
+		cout << endl;
+		gloslistCpy->print();
+		cout << endl;
+		glosentryCpy->print();
+		cout << endl;
+		glosdefCpy->print();
 		getchar();
 	}
 }

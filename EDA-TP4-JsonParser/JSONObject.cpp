@@ -172,7 +172,7 @@ JSONObject::howManyFields(string& s)
 
 		case FOUNDANDSKIP:
 		{
-			i = s.find_first_not_of(' ', i);
+			i = s.find_first_not_of("\ \r\n", i);
 
 			if (s[i] == '{')
 			{
@@ -182,7 +182,7 @@ JSONObject::howManyFields(string& s)
 			{
 				sum--;
 			}
-			else if (sum == 0)
+			if (sum == 0)
 			{
 				state = SEARCHING;
 			}
