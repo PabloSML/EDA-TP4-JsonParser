@@ -284,14 +284,25 @@ JSONObject::copyField(const char* f)
 				}
 				else if (type == string("array"))
 				{
-					string* newArrayArr = new string[size];
+					JSONObject* newArrayArr = new JSONObject[size];
+					bool end = false;
 					for (int j = 0; j < size; j++)
 					{
-						string* temp = (string*)copyArrayValue(f, j);
-						newArrayArr[j] = *(temp);
+						JSONObject* temp = (JSONObject*)copyArrayValue(f, j);
+						string tempContent = temp->getUnparsed();
+						if (!(newArrayArr[j].parseString(tempContent)))
+							end = true;
 						delete temp;
 					}
-					copy = newArrayArr;
+					if (end)
+					{
+						copy = NULL;
+						string errorDesc = string("There was an error copying an \"array\" type element in the array. copyField Fail.");
+						err.setError(true);
+						err.setErrorString(errorDesc);
+					}
+					else
+						copy = newArrayArr;
 				}
 				else if (type == string("string"))
 				{
@@ -599,7 +610,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					if (!strcmp(getArrayType(f), "number"))
 					{
 						int comas = 0;
-						for (int b = 0; b < contenido.length; i++)
+						for (int b = 0; b < contenido.length; b++)
 						{
 							if (contenido[b] == ',')
 							{
@@ -621,7 +632,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					{
 						int comas = 0;
 						bool* tof=NULL;
-						for (int b = 0; b < contenido.length; i++)
+						for (int b = 0; b < contenido.length; b++)
 						{
 							if (contenido[b] == ',')
 							{
@@ -649,7 +660,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					if (!strcmp(getArrayType(f), "string"))
 					{
 						int comas = 0, cont = 0;
-						for (int b = 0; b < contenido.length; i++)
+						for (int b = 0; b < contenido.length; b++)
 						{
 							if (contenido[b] == '\"')
 							{
@@ -679,7 +690,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					if (!strcmp(getArrayType(f), "array"))
 					{
 						int comas = 0, cont = 0;
-						for (int b = 1; b < (contenido.length-1); i++)
+						for (int b = 1; b < (contenido.length-1); b++)
 						{
 							if (contenido[b] == '[')
 							{
@@ -704,8 +715,9 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 								}
 							}
 						}
-						string* arrStr = new string(valor);
-						copy = arrStr;
+						string completo = "{\"Array" + to_string(pos) + "ValueCopy\":" + valor + "}";
+						JSONObject* arreglo = new JSONObject(completo);
+						copy = arreglo;
 					}
 				}
 			}
