@@ -4,54 +4,64 @@
 #include "FMSCell.h"
 
 using namespace std;
+void FSMDigit::FSMDigit(string& s, JSONError* err, int *i) {
+	currentState = INITIAL;
+	this->s = s;
+	this->err = err;
+	this->index = i;
+}
 
-void FSMDigit::cycle(string& s) {
-
-	const FMSCell FSMTable[STATES][EVENTS] ={	{{states::DIGIT, continueToDo},		{states::DIGIT, continueToDo}, {states::DIGIT, continueToDo}, {states::COMA, continueToDo}, {states::EXPONENT, continueToDo},	{states::EXPONENT, continueToDo}, {states::DIGIT, continueToDo}},
-												{{states::ZERONOT, continueToDo},	{states::DIGIT, continueToDo}, {states::DIGIT, continueToDo}, {states::COMA, continueToDo}, {states::EXPONENT, continueToDo},	{states::EXPONENT, continueToDo}, {states::ERROR, error}},
-												{{states::ERROR, error},			{states::ERROR, error},        {states::COMA, continueToDo},  {states::ERROR, error},       {states::ERROR, error},				{states::ERROR, error},			  {states::COMA, continueToDo}},
-												{{states::NEGATIVE, continueToDo},	{states::ERROR, error},        {states::ERROR, error},        {states::ERROR, error},       {states::EXPONENT, continueToDo},	{states::ERROR, error},           {states::ERROR, error}},
-												{{states::ERROR, error},			{states::ERROR, error},        {states::EXPOI, continueToDo}, {states::EXPOI, continueToDo},{states::ERROR, error},				{states::ERROR, error},           {states::EXPOI, continueToDo}},
-												{{states::ERROR, error},			{states::ERROR, error},        {states::ERROR, error},        {states::ERROR, error},       {states::EXPONENT, continueToDo},	{states::ERROR, error},           {states::ERROR, error}},
-												{{states::ERROR, error},			{states::ERROR, error},        {states::ERROR, error},        {states::ERROR, error},       {states::ERROR, error},				{states::ERROR, error},           {states::ERROR, error}},
-											};
+void FSMDigit::cycle(events ev) {
+	const FMSCell FSMTable[STATES][EVENTS] = { {{states::DIGIT, ok},		{states::DIGIT, ok},	{states::DIGIT, ok},    {states::DIGIT, ok},    {states::COMA, ok},		{states::ERROR, error},	{states::EXPONENT, ok}, {states::DIGIT, ok},     {states::ERROR, error}, {states::QUIT, ok}},
+												{ {states::ZERONOT, ok},  	{states::DIGIT, ok},	{states::DIGIT, ok},	{states::DIGIT, ok},    {states::COMA, ok},		{states::ERROR, error},	{states::EXPONENT, ok}, {states::ERROR, error},  {states::ERROR, error}, {states::QUIT, ok}},
+												{ {states::ERROR, error},	{states::COMA, error},  {states::COMA, ok},		{states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error},	{states::ERROR, error}, {states::COMA, ok},      {states::ERROR, error}, {states::QUIT, ok}},
+												{ {states::NEGATIVE, ok},	{states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::EXPONENT, ok},	{states::ERROR, error}, {states::ERROR, error},  {states::ERROR, error}, {states::QUIT, ok}},
+												{ {states::ERROR, error},	{states::EXPOI, error}, {states::EXPOI, ok},	{states::ERROR, error}, {states::EXPOI, ok},	{states::ERROR, error},	{states::ERROR, error}, {states::EXPOI, ok},     {states::ERROR, error}, {states::QUIT, ok}},
+												{ {states::ERROR, error},	{states::ERROR, error}, {states::ERROR, error},	{states::ERROR, error}, {states::ERROR, error}, {states::EXPONENT, ok},	{states::ERROR, error}, {states::ERROR, error},  {states::ERROR, error}, {states::QUIT, ok}},
+												{ {states::ERROR, error},   {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error},  {states::ERROR, error}, {states::QUIT, ok}},
+												{ {states::QUIT, ok},		{states::QUIT, ok},     {states::QUIT, ok},     {states::ERROR, error}, {states::QUIT, ok},     {states::ERROR, error}, {states::QUIT, ok},     {states::QUIT, ok},      {states::ERROR, error}, {states::QUIT, ok}} };
 	
-	bool ok = true; //corta antes si el programa dio error
-	states state = INITIAL; 
-	events event_;
-	JSONError error_t(true, '');
-	for (int i = 0; i < s.length() && ok; i++) {
-		if (isdigit(s[i]) && s[i] != '0') {
+	FSMTable[currentState][ev].action(err); 
+	currentState = FSMTable[currentState][ev].nextState;
+	}
+
+events FSMDigit::getEvent(char s) {
+		if (isdigit(s) && s != '0') {
 			event_ = events::DIGITS;
 		}
-		else if (s[i] == '0') {
+		else if (s == '0') {
 			event_ = events::ZERO;
 		}
-		else if (s[i] == '.') {
+		else if (s== '.') {
 			event_ = events::COMA;
 		}
-		else if (s[i] == '-') {
+		else if (s == '-') {
 			event_ = events::NEGATIVE;
 		}
-		else if (s[i] == 'E' || s[i] == 'e') {
-			event_ == events::EXPONENT;
+		else if (s == 'E' || s == 'e') {
+			event_ == events::E;
 		}
-		else if (s[i] == '+') {
-			event_ = events::PLUS;
+		else if (s== '+') {
+			event_ = events::PLUS
 		}
-		else{
+		else if (s == NULL) {
+			event_ = events::QUIT;
+		}
+		else {
 			event_ = events::ELSE;
 		}
-		ok = FSMTable[state][event_].action(&error_t);
-		state = FSMTable[state][event_].nextState;
-	}
+		return event_;
 }
 
-;bool continueToDo(void* UserData){
-	return true;
+states getState(){
+	return currentState;
 }
 
-bool error(void* UserData) {
+void ok(void* UserData){
+	return;
+}
+
+void error(void* UserData) {
 	((JSONError*)UserData)->setErrorString(ERROR_NUM);
 	return false;
 }
