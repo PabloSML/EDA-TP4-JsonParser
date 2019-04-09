@@ -2,7 +2,7 @@
 #include <cstring>
 #include <array>
 #include <cctype>
-#include <iostream>;
+#include <iostream>
 #define INITIALSIZE 100
 
 using namespace std;
@@ -12,7 +12,11 @@ JSONObject::JSONObject(void){}
 
 JSONObject::JSONObject(string& s){
 	unparsed = s;
-	parseInput(s);
+	if (!(parseInput(s)))
+	{
+		cout << "parseInput error" << endl;
+		getchar();
+	}
 }
 
 JSONObject::JSONObject(const char * s)
@@ -20,7 +24,11 @@ JSONObject::JSONObject(const char * s)
 	string to_app;
 	to_app.append(s);
 	unparsed = to_app;
-	parseInput(to_app);
+	if (!(parseInput(to_app)))
+	{
+		cout << "parseInput error" << endl;
+		getchar();
+	}
 }
 
 bool
@@ -29,20 +37,21 @@ JSONObject::parseInput(string& s) {
 
 	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
 		fieldCount = howManyFields(s);
+		fields = new Field[fieldCount];
 		int i = 0;
-		for (int counter = 0; counter < fieldCount; counter++) {
+		for (unsigned int counter = 0; counter < fieldCount; counter++) {
 			bool saved = false;
 			int sum = 0;
-			int aux = s.find_first_of('"', i);  //guardo el name
+			int aux = s.find_first_of('\"', i);  //guardo el name
 			i = aux + 1;
-			aux = s.find_first_of('"', i);
-			fields[counter].setFieldName(s.substr(i, aux + 1));
+			aux = s.find_first_of('\"', i);
+			fields[counter].setFieldName(s.substr(i, aux-i));
 			i = aux + 1;
-			i = s.find_first_not_of(': ', i);
+			i = s.find_first_not_of(": \r\n", i);
 			while (!saved) {     //quiero guardar el content segun que es:objeto array string o cualquier otra cosa
 				int start = i;
 				int end=start+1;
-				if (start == '"') {           //caso 1: si me encuentro con un string 
+				if (s[start] == '"') {           //caso 1: si me encuentro con un string 
 					start++;
 					end = s.find_first_of('"', start);
 					int check = s.find_first_of(R"(\)", start);  //las comillas no pueden estar escapadas por la barra
@@ -54,7 +63,7 @@ JSONObject::parseInput(string& s) {
 
 					}
 				}
-				else if (start == '{') {        //caso 2: si me encuentro con un objeto
+				else if (s[start] == '{') {        //caso 2: si me encuentro con un objeto
 					sum++;
 					end = start + 1;
 					for (end; sum != 0; end++) {
@@ -66,7 +75,7 @@ JSONObject::parseInput(string& s) {
 						}
 					}
 				}
-				else if (start == '[') {        //caso 3: si me encuentro con un array
+				else if (s[start] == '[') {        //caso 3: si me encuentro con un array
 					sum++;
 					for (end; sum != 0; end++) {
 						if (s[end] == '[') {
@@ -80,7 +89,7 @@ JSONObject::parseInput(string& s) {
 				else {
 					end = s.find_first_of(",{", start+1);     //caso 4: si me encuentro con cualquier otra cosa
 				}
-				fields[counter].setContent(s.substr(start, end));
+				fields[counter].setContent(s.substr(start, end-start));
 				i = end + 1;
 				saved = true;
 			}
@@ -106,9 +115,9 @@ const char *
 JSONObject::getFieldType(const char * f)
 {
 	bool found = false;
-	const char* type;
+	const char* type = "invalid";
 
-	for (int i = 0; i < fieldCount && !found; i++)
+	for (unsigned int i = 0; i < fieldCount && !found; i++)
 	{
 		found = fields[i].getFieldName() == string(f);
 
@@ -129,7 +138,6 @@ JSONObject::getFieldType(const char * f)
 	}
 	if (!found)
 	{
-		type = "invalid";
 		string errorDesc = string("The field name entered does not match current known fields. getFieldType Fail.");
 		err.setError(true);
 		err.setErrorString(errorDesc);
@@ -197,7 +205,7 @@ const char*
 JSONObject::getArrayType(const char* f)
 {
 	bool found = false;
-	const char* type;
+	const char* type = "invalid";
 
 	for (int i = 0; i < fieldCount && !found; i++)
 	{
@@ -206,7 +214,7 @@ JSONObject::getArrayType(const char* f)
 		if (found)
 		{
 			i--;
-			if (fields[i].getFieldType == string("array"))
+			if (string(fields[i].getFieldType()) == string("array"))
 			{
 				string content = fields[i].getContent();
 				unsigned int index = content.find_first_not_of(' '); // Se busca un marker para ver el tipo de elemento ({[\"tfn-0123456789)
@@ -226,7 +234,6 @@ JSONObject::getArrayType(const char* f)
 	}
 	if (!found)
 	{
-		type = "invalid";
 		string errorDesc = string("The array name entered does not match current known arrays. getArrayType Fail.");
 		err.setError(true);
 		err.setErrorString(errorDesc);
@@ -380,7 +387,7 @@ JSONObject::isFieldPresent(const char* f)
 	unsigned int count = fieldCount;
 	for (int i = 0; i < fieldCount && !found; i++)
 	{
-		if (fields[i].getFieldName == string(f))
+		if (string(fields[i].getFieldName()) == string(f))
 		{
 			found = true;
 		}
@@ -417,7 +424,7 @@ JSONObject::getFieldSize(const char * f)
 			{
 				if (fields[i].getFieldName() == string(f))
 				{
-					size = fields[i].getContent().length;
+					size = fields[i].getContent().length();
 				}
 			}
 		}
@@ -431,7 +438,7 @@ JSONObject::getFieldSize(const char * f)
 				{
 					if (!strcmp(getArrayType(f), "string"))
 					{
-						for (int a = 0; a < fields[i].getContent().length; a++)
+						for (int a = 0; a < fields[i].getContent().length(); a++)
 						{
 							if (fields[i].getContent()[a] == '\"')
 							{
@@ -444,7 +451,7 @@ JSONObject::getFieldSize(const char * f)
 					}
 					else if (!strcmp(getArrayType(f), "number") || !strcmp(getArrayType(f), "bool"))
 					{
-						for (int a = 0; a < fields[i].getContent().length; a++)
+						for (int a = 0; a < fields[i].getContent().length(); a++)
 						{
 							if (fields[i].getContent()[a] == ',')
 							{
@@ -456,7 +463,7 @@ JSONObject::getFieldSize(const char * f)
 					else if (!strcmp(getArrayType(f), "object"))
 					{
 						int elements = 0;
-						for (int a = 0; a < fields[i].getContent().length; a++)
+						for (int a = 0; a < fields[i].getContent().length(); a++)
 						{
 							if (fields[i].getContent()[a] == '{')
 							{
@@ -476,7 +483,7 @@ JSONObject::getFieldSize(const char * f)
 					else if (!strcmp(getArrayType(f), "array"))
 					{
 						int elements = 0;
-						for (int a = 0; a < fields[i].getContent().length; a++)
+						for (int a = 0; a < fields[i].getContent().length(); a++)
 						{
 							if (fields[i].getContent()[a] == '[')
 							{
@@ -508,7 +515,7 @@ JSONObject::print(void)
 	cout << "---------------" << endl;
 	for (int i = 0; i < fieldCount; i++)
 	{
-		cout << fields[i].getFieldName() << "\t:\t" << fields[i].getFieldType << endl;
+		cout << fields[i].getFieldName() << "\t:\t" << fields[i].getFieldType() << endl;
 	}
 	cout << "End of JSON object" << endl;
 }
@@ -579,7 +586,8 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					if (!strcmp(getArrayType(f), "object"))
 					{
 						int comas = 0, cont = 0;
-						for (int b = 1; b < (contenido.length - 1); b++)
+						unsigned int lenght = contenido.length();
+						for (int b = 1; b < (lenght - 1); b++)
 						{
 							if (contenido[b] == '{')
 							{
@@ -598,7 +606,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 							if (comas == pos)
 							{
 								b++;
-								for (; contenido[b] != ',' || b < contenido.length; b++)
+								for (; contenido[b] != ',' || b < contenido.length(); b++)
 								{
 									valor.push_back(contenido[b]);
 								}
@@ -610,7 +618,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					if (!strcmp(getArrayType(f), "number"))
 					{
 						int comas = 0;
-						for (int b = 0; b < contenido.length; b++)
+						for (int b = 0; b < contenido.length(); b++)
 						{
 							if (contenido[b] == ',')
 							{
@@ -619,7 +627,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 							if (comas == pos)
 							{
 								b++;
-								for (; contenido[b] != ',' || b < contenido.length; b++)
+								for (; contenido[b] != ',' || b < contenido.length(); b++)
 								{
 									valor.push_back(contenido[b]);
 								}
@@ -632,7 +640,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					{
 						int comas = 0;
 						bool* tof=NULL;
-						for (int b = 0; b < contenido.length; b++)
+						for (int b = 0; b < contenido.length(); b++)
 						{
 							if (contenido[b] == ',')
 							{
@@ -641,7 +649,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 							if (comas == pos)
 							{
 								b++;
-								for (; contenido[b] != ',' || b < contenido.length; b++)
+								for (; contenido[b] != ',' || b < contenido.length(); b++)
 								{
 									valor.push_back(contenido[b]);
 								}
@@ -660,7 +668,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					if (!strcmp(getArrayType(f), "string"))
 					{
 						int comas = 0, cont = 0;
-						for (int b = 0; b < contenido.length; b++)
+						for (int b = 0; b < contenido.length(); b++)
 						{
 							if (contenido[b] == '\"')
 							{
@@ -678,7 +686,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 							if (comas == pos)
 							{
 								b+=2;
-								for (; contenido[b] != '\"' || b < contenido.length; b++)
+								for (; contenido[b] != '\"' || b < contenido.length(); b++)
 								{
 									valor.push_back(contenido[b]);
 								}
@@ -690,7 +698,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 					if (!strcmp(getArrayType(f), "array"))
 					{
 						int comas = 0, cont = 0;
-						for (int b = 1; b < (contenido.length-1); b++)
+						for (int b = 1; b < (contenido.length()-1); b++)
 						{
 							if (contenido[b] == '[')
 							{
@@ -709,7 +717,7 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 							if (comas == pos)
 							{
 								b++;
-								for (; contenido[b] != ',' || b < (contenido.length-1); b++)
+								for (; contenido[b] != ',' || b < (contenido.length()-1); b++)
 								{
 									valor.push_back(contenido[b]);
 								}

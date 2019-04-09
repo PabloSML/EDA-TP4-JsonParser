@@ -217,7 +217,7 @@ private:
 	Field* fields;
 	JSONError err;
 	string unparsed;
-	bool ErrorCheck(string& s);
+	bool ErrorCheck(string& s) { return false; }
 	unsigned int howManyFields(string& s);
 	bool parseInput(string& s);
 };

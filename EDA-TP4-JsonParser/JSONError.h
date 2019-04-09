@@ -17,7 +17,7 @@ using namespace std;
 class JSONError
 {
 public:
-	JSONError(bool hasFailed = false, const char * Desc = NULL);	//aunque no parece es el constructor por defecto porque es posible llamarlo sin argumentos
+	JSONError(bool hasFailed = false, const char * Desc = "");	//aunque no parece es el constructor por defecto porque es posible llamarlo sin argumentos
 
 	string getErrorString(void);
 	bool hasFailed(void);

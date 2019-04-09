@@ -8,8 +8,8 @@ class Field
 public:
 	Field(){
 		fieldType = NULL;
-		fieldName = string(NULL);
-		content = string(NULL);
+		fieldName = string("");
+		content = string("");
 	}
 
 	void setFieldName(string n);
