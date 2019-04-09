@@ -2,135 +2,123 @@
 #include "FSMObject.h"
 #include "FSMDigit.h"
 #include <cstdlib>
-#include "FSMObjectAux.h"
-#include "FMSCell.h"
 using namespace std;
 
-bool
-FSMObject::cycle(string& s) {
-	const FMSCell FSMTable[STATES][EVENTS] = { {{STRINGI, ok}, {END, error}, {STRING, ok},   {STRING, ok}, {END, error},     {RESET,find_object},        {END, error},  {END, error}},
-											   {{END,error},   {END, error}, {STRING, ok},  {STRING, ok}, {END, error},    {END, error},				  {END, ok},     {END, error}},
-											   {{END, error},  {END, error}, {STRING, ok},  {STRING, ok}, {FINDVALUE, ok}, {END, error},				  {END, error},  {END, error}},
-											   {{END, error},  {END, error}, {STRING, ok},  {STRING, ok}, {END, error},    {END, error},				  {STRINGI, ok}, {END, error}},
-											   {{END, error},  {STRINGC, ok}, {STRING, ok}, {NEWV, ok}, {END, error},     {RESET, find_string},       {END, error},  {END, error}},
-											   {{END, error},  {END, error}, {STRING, ok},  {STRING,ok}, {END, error},    {RESET, find_array},        {END, error},  {END, error}},
-												{{END, error},  {END, error}, {IGNORE, ok},  {IGNORE, ok}, {END, error},    {END, error},				  {END, error},  {END, error}},
-												{{END, error},  {END, error}, {STRING, ok}, {STRING, ok}, {END, error},    {RESET, find_bool_or_null}, {END, error},  {END, error}},
-												{{END, error},  {END, error}, {STRING, ok},  {STRING, ok}, {END, error},    {RESET, find_num},		  {END, error},  {END, error}},
-												{{END, error},  {END, error}, {STRING, ok},  {STRING, ok}, {END, error},    {RESET, find_num},          {END, error},  {END, error}},
-												{{END, error},  {END, error}, {END, error},  {END, error}, {END, error},    {END, error},               {END, error},  {STRING,ok}},
-												{{END, error},  {END, error}, {STRING, ok},  {STRING, ok}, {END, error},     {END, error},			      {END, error},  {END, error} } }
+typedef struct {
+	statesob; nextState;
+	bool(*action)(void* UserData);
+}FMSCell;
+FSMObject::FSMObject(string& s, JSONError* err, int *i) {
+	currentState = INITIAL;
+	this->err = err;
+	this->index = i;
+	this->s = s;
+}
+void FSMObject::cycle(eventsob ev) {
+	const FMSCell FSMTable[STATES_OBJ][EVENTS_OBJ] = { { {statesob::STRINGI, ok},  {statesob::ERROR, error},    {statesob::ERROR, error},  {statesob::NEWOREND,find_object},         {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::ERROR, error},		   {statesob::ERROR, error},  {statesob::ERROR, error},                 {statesob::QUIT, ok},      {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::ERROR, error},           {statesob::FINDVALUE, ok}, {statesob::ERROR, error},                 {statesob::STRINGI, ok},   {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::ERROR, error},           {statesob::ERROR, error}, {statesob::ERROR, error},                  {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::WAITFORV, find_string},  {statesob::ERROR, error},  {statesob::NEWOREND,find_string},          {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::ERROR, error},           {statesob::ERROR, error},  {statesob::NEWOREND, find_array},         {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::ERROR, error},           {statesob::ERROR, error},  {statesob::ERROR, error},                 {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::ERROR, error},           {statesob::ERROR, error},  {statesob::ERROR, error},                 {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::ERROR, error},           {statesob::ERROR, error},  {statesob::NEWOREND, find_bool_or_null},  {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::ERROR, error},           {statesob::ERROR, error},  {statesob::NEWOREND, find_bool_or_null},  {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::ERROR, error},           {statesob::ERROR, error},  {statesob::ERROR, error},                 {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::ERROR, error}, {statesob::ERROR, error},           {statesob::ERROR, error},  {statesob::NEWOREND, find_bool_or_null},  {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+											   { {statesob::QUIT, ok},     {statesob::ERROR, error},           {statesob::ERROR, error},  {statesob::ERROR, error},                 {statesob::ERROR, error},  {statesob::ERROR, error}, {statesob::QUIT,ok} },
+						     				   { {statesob::INITIAL, ok},  {statesob::STRINGI, ok},            {statesob::WAITFORV, ok},  {statesob::FINDVALUE, ok},                {statesob::NEWOREND, ok},  {statesob::ERROR, error}, {statesob::QUIT,ok} } };
 	
-	bool ok = true;
-	states state = INITIAL;
-	events event_;
-	Data conection;
-	JSONError err;
-	conection.error_t(&err);
-	int i = s.find_first_not_of(" ");
-	while (i < s.length()) {
-		if (s[i] == "{") {
-			event_ = OPENKEYS;
-		}
-		else if (s[i] == "}") {
-			event_ = CLOSEKEYS;
-		}
-		else if (s[i] == ":") {
-			event_ = TWODOTS;
-		}
-		else if (s[i] == ",") {
-			event_ = COMA;
-		}
-		else if(s[i]=="["){
-			event_ = OPENCORCHETES;
-		}
-		else if (s[i] == R"(\)") {
-			event_ = BARRAINVERTIDA;
-		}
-		else if (isalpha(s[i])) {
-			event_ = LETTER;
-		}
-		else if(isdigit(s[i])){
-			event_ = NUM;
-		}
-		else if(s[i]=="-"){
-			event_ = NEG;
-		}
-		else if(s[i]=="") //falta corregir
-		{
+	ExtraInfo* toConect;
+	toConect->i = index;
+	toConect->to_check = s;
+	toConect->error_t = err;
+	FSMTable[currentState][ev].action(toConect);
+	currentState = FSMTable[currentState][ev].nextState;
 
-		}
-		else {
-			event_ = ELSE;
-		}
-		conection.index = &i;
-		conection.to_check = s;
-		ok = FSMTable[state][event_].action(&conection);
-		state = FSMTable[state][event_].nextState;
+}
+
+
+eventsob FSMObject::getState() {
+	return currentState;
+}
+
+
+void FSMObject::getEvent(char s) {
+	eventsob event_;
+	if (s == '{') {
+		event_ = eventsob::OPENKEYS;
 	}
-
-}
-
-
-
-bool ok(void* UserData) {
-	*((Data*)UserData->index)++; //incrementa el indice con el que estoy trabajando el string
-	return true;
-}
-
-bool error(void* UserData) {
-	((Data*)UserData)->setErrorString(ERROR_OBJ);
-	return false;
-}
-
-bool find_string(void* UserData) {
-	int end = ((Data*)UserData)->to_check.find_first_of('"', 1+*((*Data)UserData->index)); //quiero ver donde termine el string para parsearlo 
-	int check= ((Data*)UserData)->to_check.find_first_of(R"(\)", *((*Data)UserData->index)); // me fijo si la siguiente aparición esta escapada
-	bool well_formed = true;
-	while (check == end - 1 && formed)
-	{
-		aux = end + 1;
-		end = ((Data*)UserData)->to_check.find_first_of('"', aux);
-		check = ((Data*)UserData)->to_check.find_first_of(R"(\)", aux);
-		if (end==string::npos){
-			((Data*)UserData)->error_t.setErrorString(ERROR_OBJ);
-			return false;
-		}
-
+	else if (s == '}') {
+		event_ = eventsob::CLOSEKEYS;
 	}
-
-	//ahora que tengo los indices de donde empieza y termina mi string lo parse con la futura fsm de strings
-	return true;
+	else if (s == ':') {
+		event_ = eventsob::TWODOTS;
+	}
+	else if (s == ',') {
+		event_ = eventsob::COMA;
+	}
+	else if (s == '[') {
+		event_ = eventsob::OPENCORCHETES;
+	}
+	else if (s == R"(\)") {
+		event_ = eventsob::BARRAINVERTIDA;
+	}
+	else if (isalpha(s)) {
+		event_ = eventsob::LETTER;
+	}
+	else if (isdigit(s)) {
+		event_ = eventsob::NUM;
+	}
+	else if (s == '-') {
+		event_ = eventsob::NEG;
+	}
+	else if (isspace(s)) {
+		event_ = eventsob::BLANKSPACE;
+	}
+	else if (s == NULL) {
+		event_ = eventsob::QUIT;
+	}
+	else {
+		event_ = eventsob::ELSE;
+	}
+	return event_;
 }
 
-/*bool find_array(void* UserData) {
-	int sum
-	int start = *((*Data)UserData->index);
 
-}*/
+void ok(void* UserData) {
+	return;
+}
+void error(void* UserData) {
+	(((ExtraInfo*)UserData)->error_t)->setError(true);
+	(((ExtraInfo*)UserData)->error_t)->setErrorString(ERROR_OBJ);
+}
 
-bool find_bool_or_null(void* UserData) {
-	int end= ((Data*)UserData)->to_check.find_first_of(',}', 1 + *((*Data)UserData->index));
+void find_string(void* UserData) {
+  
+}
+
+void find_array(void* UserData) {
+
+}
+
+void find_num(void* UserData) {
+	string toParse = (((ExtraInfo*)UserData)->to_check);
+	int* i = (((ExtraInfo*)UserData)->index);
+	int end = toParse.find_first_of();
 	if (end == string::npos) {
-		(Data*)UserData.error_t.setErrorString(ERROR_OBJ);
-		return false;
+		error(UserData);
 	}
-	//ahora que tengo el supuesto bool, me fijo si es un bool con la futura fsm de bool
-}
-
-bool find_num(void* UserData) {
-	int start = *(((Data*)UserData)->index);
-	int end = ((Data*)UserData)->to_check.find_first_of(',}', 1 + start); //me fijo donde termina el supuesto numero, si esta bien hecho deberia haber un } o una , alfinal
-	if (end == string::npos) {
-		((Data*)UserData)->error_t.setErrorString(ERROR_OBJ);
-		return false;
+	string toFSM = toParse.substr(*i + 1, end + 1 - i * );
+	FSMDigit parseDig(toFSM, (((ExtraInfo*)UserData)->error_t),i);
+	for (int j = 0; j < toFSM && parseDig.getState() != ERROR; j++) {
+		cycle(parseDig.getEvent(toFSM[j]));
 	}
-	end -= 1;
-    
-	FSMDigit parseDigit;
-	return parseDigit.cycle(((Data*)UserData)->to_check.substr(start, end)); //devuelvo si el numero es valido
-}
+	if (parseDig.getState() != ERROR) {
+		cycle(parseDig.getEvent(NULL));
+	}
+	else {
 
-bool find_object(void* UserData) {
-
+	}
 }

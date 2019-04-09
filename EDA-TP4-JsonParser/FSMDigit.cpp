@@ -12,7 +12,7 @@ void FSMDigit::FSMDigit(string& s, JSONError* err, int *i) {
 }
 
 void FSMDigit::cycle(events ev) {
-	const FMSCell FSMTable[STATES][EVENTS] = { {{states::DIGIT, ok},		{states::DIGIT, ok},	{states::DIGIT, ok},    {states::DIGIT, ok},    {states::COMA, ok},		{states::ERROR, error},	{states::EXPONENT, ok}, {states::DIGIT, ok},     {states::ERROR, error}, {states::QUIT, ok}},
+	const FMSCell FSMTable[STATES][EVENTS] = {  { {states::DIGIT, ok},		{states::DIGIT, ok},	{states::DIGIT, ok},    {states::DIGIT, ok},    {states::COMA, ok},		{states::ERROR, error},	{states::EXPONENT, ok}, {states::DIGIT, ok},     {states::ERROR, error}, {states::QUIT, ok}},
 												{ {states::ZERONOT, ok},  	{states::DIGIT, ok},	{states::DIGIT, ok},	{states::DIGIT, ok},    {states::COMA, ok},		{states::ERROR, error},	{states::EXPONENT, ok}, {states::ERROR, error},  {states::ERROR, error}, {states::QUIT, ok}},
 												{ {states::ERROR, error},	{states::COMA, error},  {states::COMA, ok},		{states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error},	{states::ERROR, error}, {states::COMA, ok},      {states::ERROR, error}, {states::QUIT, ok}},
 												{ {states::NEGATIVE, ok},	{states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::EXPONENT, ok},	{states::ERROR, error}, {states::ERROR, error},  {states::ERROR, error}, {states::QUIT, ok}},
@@ -26,6 +26,7 @@ void FSMDigit::cycle(events ev) {
 	}
 
 events FSMDigit::getEvent(char s) {
+	events events_;
 		if (isdigit(s) && s != '0') {
 			event_ = events::DIGITS;
 		}
@@ -53,7 +54,7 @@ events FSMDigit::getEvent(char s) {
 		return event_;
 }
 
-states getState(){
+states FSMDigit::getState(){
 	return currentState;
 }
 
