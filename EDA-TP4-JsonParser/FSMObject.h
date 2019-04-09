@@ -1,6 +1,10 @@
 #pragma once
 class FSMObject {
 public:
-	bool cycle(string& s);
+	FSMObject(string& s, JSONError* err, int *i);
+	void cycle(string& s);
+private: 
+	string s;
+	J
 	
 };

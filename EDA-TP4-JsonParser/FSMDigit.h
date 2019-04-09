@@ -1,7 +1,7 @@
 #pragma once
 class FSMDigit {
 public:
-	FSMDigit(string& s, JSONError& err, int *i);
+	FSMDigit(string& s, JSONError* err, int *i);
 	void cycle(events ev);
 	events getEvent(char s);
 	states getState();
