@@ -1,9 +1,9 @@
 #include "JSONError.h"
 
-JSONError::JSONError(bool hasFailed = false, const char * Desc = NULL)
+JSONError::JSONError(bool hasFailed , const char * Desc)
 {
 	error = hasFailed;
-	errorString = Desc;
+	errorString = string(Desc);
 }
 
 bool JSONError::hasFailed(void){ return error; }
