@@ -4,11 +4,9 @@
 #include "FMSCell.h"
 
 using namespace std;
-void FSMDigit::FSMDigit(string& s, JSONError* err, int *i) {
+void FSMDigit::FSMDigit(JSONError* err) {
 	currentState = INITIAL;
-	this->s = s;
 	this->err = err;
-	this->index = i;
 }
 
 void FSMDigit::cycle(events ev) {
