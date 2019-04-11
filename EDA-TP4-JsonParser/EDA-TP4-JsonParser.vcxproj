@@ -115,6 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Eventgenerator.h" />
     <ClInclude Include="field.h" />
     <ClInclude Include="JSONError.h" />
     <ClInclude Include="JSONObject.h" />
