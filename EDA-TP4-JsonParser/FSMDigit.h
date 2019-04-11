@@ -22,11 +22,11 @@ typedef struct {
 	states nextState;
 	void(*action)(void* UserData);
 
-}FSMCell;
+}FSMCellD;
 
 class FSMDigit : public Eventgenerator {
-public:
-	
+
+public:	
 	FSMDigit();
 
 	states getState();

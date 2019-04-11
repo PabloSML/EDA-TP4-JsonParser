@@ -1,4 +1,5 @@
 #include "MonsterFSM.h"
+#include "FSMDigit.h"
 #include <cstdlib>
 
 using namespace std;
@@ -53,31 +54,32 @@ MonsterFSM::getEvent(char s) {
 	return ev;
 }
 
-void MonsterFSM::cycle(monsterEvents ev) {                            //INITIAL                     STRINGI                          STRINGN                      STRINGE                          FINDVALUE                                   OBJ                       NUMORBOLL                       ARRAY                       NULLORBOLL                       ARRAY                       NUM                      STRING                      FINDORQUIT                      QUIT                       ERROR                         IGNORE
-	/*static FMSCell MonsterFSMTable[MONSTEREVENTS][MONSTERSTATES] = { { {monsterStates::STRINGI, ok},  {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok}, {monsterStates::ERROR, error},  {monsterStates::OBJ, createObjMachine},      {monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM,ok}, {monsterStates::STRING, ok}, {monsterStates::ERROR, error}, {monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} },
-															  {	{monsterStates::ERROR, error}, {monsterStates::ERROR, error}, {monsterStates:STRINGN, ok},  {monsterStates::ERROR, error},  {monsterStates::ERROR, error},               {monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM,ok}, {monsterStates::STRING, ok}, {monsterStates::QUIT, ok},      {monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} },
-															  { {monsterStates::ERROR, error}, {monsterStates::STRING, ok},   {monsterStates::STRINGE, ok}, {monsterStates::ERROR, error},  {monsterStates::STRING, createStringMachine},{monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM, ok}, {monsterStates::STRING, ok}, {monsterStates::ERROR, error}, {monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} },
-															  { {monsterStates::ERROR, error}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok}, {monsterStates::FINDVALUE, ok}, {monsterStates::ERROR, error},               {monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM,ok}, {monsterStates::STRING, ok}, {monsterStates::ERROR, error},  {monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} },
-															  {	{monsterStates::ERROR, error}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok}, {monsterStates::ERROR, error},  {monsterStates::ERROR, error},               {monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM,ok}, {monsterStates::STRING, ok}, {monsterStates::STRINGI, ok},   {monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} },
-															  { {monsterStates::ERROR, error}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok}, {monsterStates::ERROR, error},  {monsterStates::ARRAY, createArrayMachine},  {monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM,ok}, {monsterStates::STRING, ok}, {monsterStates::ERROR, ok},     {monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} } };
-	                                                          { {monsterStates::ERROR, error}, { monsterStates::ERROR, error }, { monsterStates::STRINGN, ok }, { monsterStates::ERROR, error }, { monsterStates::NUM, createANumMachine } };
-		
-       */
-	    
-        if (this->activeEventGenerator) {
-			this->generator->cycle(this->actualchar);
-			if (event_t::ERROR == (this->generator)->getReport()) {
-				currentEvent = ERROR;
-			}
-		}
-		else {
-			/*MonsterFSMTable[ev][currentState].action();
-			currentState = MonsterFSMTable[ev][currentState]; */
+void MonsterFSM::cycle(monsterEvents ev) {                            //INITIAL                     STRINGI                          STRINGN                      STRINGE                          FINDVALUE                                   OBJ                       NULLORBOLL                       ARRAY                       NUM                       ARRAY                       NUM                      STRING                      FINDORQUIT                      QUIT                       ERROR                         IGNORE
+	/*const FMSCell MonsterFSMTable[MONSTEREVENTS][MONSTERSTATES] = { { {monsterStates::STRINGI, ok},  {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok}, {monsterStates::ERROR, error},  {monsterStates::OBJ, createObjMachine},      {monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM,ok}, {monsterStates::STRING, ok}, {monsterStates::ERROR, error}}, //{monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} },
+																	{ {monsterStates::ERROR, error}, {monsterStates::ERROR, error}, {monsterStates:STRINGN, ok},  {monsterStates::ERROR, error},  {monsterStates::ERROR, error},               {monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM,ok}, {monsterStates::STRING, ok}, {monsterStates::QUIT, ok}},      //{monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} },
+																	{ {monsterStates::ERROR, error}, {monsterStates::STRING, ok},   {monsterStates::STRINGE, ok}, {monsterStates::ERROR, error},  {monsterStates::STRING, createStringMachine},{monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM, ok}, {monsterStates::STRING, ok}, {monsterStates::ERROR, error}}, //{monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} },
+																	{ {monsterStates::ERROR, error}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok}, {monsterStates::FINDVALUE, ok}, {monsterStates::ERROR, error},               {monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM,ok}, {monsterStates::STRING, ok}, {monsterStates::ERROR, error}},  //{monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} },
+																	{ {monsterStates::ERROR, error}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok}, {monsterStates::ERROR, error},  {monsterStates::ERROR, error},               {monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM,ok}, {monsterStates::STRING, ok}, {monsterStates::STRINGI, ok}},   //{monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} },
+																	{ {monsterStates::ERROR, error}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok}, {monsterStates::ERROR, error},  {monsterStates::ARRAY, createArrayMachine},  {monsterStates::OBJ, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NULLORBOOL, ok}, {monsterStates::ARRAY, ok}, {monsterStates::NUM,ok}, {monsterStates::STRING, ok}, {monsterStates::ERROR, ok}}    //{monsterStates::QUIT, ok}, {monsterStates::ERROR, error}, {monsterStates::STRINGN, ok} } 
+																  
+																	
+	
+	//{ {monsterStates::ERROR, error}, { monsterStates::ERROR, error }, { monsterStates::STRINGN, ok }, { monsterStates::ERROR, error }, { monsterStates::NUM, createANumMachine } };
+		*/
+       
+	FSMCellM MonsterFSMTable[20][20];
+			MonsterFSMTable[currentState][ev].action(this);
+			currentState = MonsterFSMTable[currentState][ev];
 
-		}
+}
+
+void
+createANumMachine(void* userData)
+{
+	FSMDigit* newFSM = new FSMDigit;
+	MonsterFSM* hola = (MonsterFSM*)userData;
+	hola->setGenerator(newFSM);
 }
 
 
-void createANumMachine(void* UserData) {
-	((MonsterFSM*)UserData)->setGenerator(FSMDigit((MonsterFSM*)UserData)->err));
-}
+
