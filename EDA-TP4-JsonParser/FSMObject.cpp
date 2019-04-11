@@ -1,19 +1,19 @@
 #include <iostream>
-#include "FSMArray.h" //incluye definicion de states
+#include "FSMObject.h" //incluye definicion de states
 
 using namespace std;
 
-FSMArray::FSMArray() : Eventgenerator()
+FSMObject::FSMObject() : Eventgenerator()
 {
-	currentEvent = events::OPENBRACKET;
+	currentEvent = events::OPENKEY;
 	currentState = states::INITIAL;
 	this->setLabel(string("object"));
 }
 
 void
-FSMArray::cycle() {
-
-	const FSMCellA FSMTable[STATES][EVENTS] = {};
+FSMObject::cycle() {
+	
+	const FSMCellO FSMTable[STATES][EVENTS] = {};
 
 	FSMTable[currentState][currentEvent].action(this);
 	currentState = FSMTable[currentState][currentEvent].nextState;
@@ -21,33 +21,33 @@ FSMArray::cycle() {
 
 
 void
-FSMArray::getEvent(char s)
+FSMObject::getEvent(char s)
 {
-
+	
 }
 
 states
-FSMArray::getState() {
+FSMObject::getState() {
 	return currentState;
 }
 
 void
 ok(void*userData)
 {
-	FSMArray* tempFSM = (FSMArray*)userData;
+	FSMObject* tempFSM = (FSMObject*)userData;
 	tempFSM->setReport(event_t::CONTINUE);
 }
 
 void
 error(void*userData)
 {
-	FSMArray* tempFSM = (FSMArray*)userData;
+	FSMObject* tempFSM = (FSMObject*)userData;
 	tempFSM->setReport(event_t::ERROR);
 }
 
 void
 quit(void*userData)
 {
-	FSMArray* tempFSM = (FSMArray*)userData;
+	FSMObject* tempFSM = (FSMObject*)userData;
 	tempFSM->setReport(event_t::QUIT);
 }

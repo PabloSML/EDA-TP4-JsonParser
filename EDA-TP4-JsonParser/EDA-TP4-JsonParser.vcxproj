@@ -126,8 +126,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="field.cpp" />
+    <ClCompile Include="FSMArray.cpp" />
     <ClCompile Include="FSMDigit.cpp" />
     <ClCompile Include="FSMMonster.cpp" />
+    <ClCompile Include="FSMObject.cpp" />
     <ClCompile Include="JSONError.cpp" />
     <ClCompile Include="JSONObject.cpp" />
     <ClCompile Include="Main.cpp" />

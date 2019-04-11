@@ -1,6 +1,9 @@
 #pragma once
 #include "Eventgenerator.h"
 
+#define STATES
+#define EVENTS
+
 enum states { INITIAL = 0, PONERMAS};
 enum events { OPENBRACKET = 0, PONERMAS};
 

@@ -59,5 +59,11 @@
     <ClCompile Include="FSMMonster.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="FSMObject.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FSMArray.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
