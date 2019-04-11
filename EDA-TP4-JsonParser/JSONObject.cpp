@@ -771,6 +771,11 @@ JSONObject::errorCheck(string& s)
 		}
 	}
 
+	ev = fsm.getEvent(NULL);	// estas ultimas cuatro lineas fuerzan un char con NULL para verificar el correcto fin del parseo
+	fsm.cycle(ev);
+	if (err.hasFailed())
+		quit = true;
+	
 	if (!quit)
 		fail = false;
 
