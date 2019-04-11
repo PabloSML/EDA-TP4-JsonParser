@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-enum event_t {STARTED, CONTINUE, ERROR, QUIT};
+enum event_t {CONTINUE, ERROR, QUIT};
 
 class Eventgenerator
 {
@@ -26,7 +26,6 @@ private:
 	string label;
 };
 
-void start(void* userData);
 void ok(void* userData);
 void error(void* userData);
 void quit(void* userData);

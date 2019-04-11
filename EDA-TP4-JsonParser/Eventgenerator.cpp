@@ -1,9 +1,5 @@
 #include "Eventgenerator.h"
 
-void start(void* userData) {
-	*(event_t*)userData = event_t::STARTED;
-}
-
 void ok(void* userData) {
 	*(event_t*)userData = event_t::CONTINUE;
 }

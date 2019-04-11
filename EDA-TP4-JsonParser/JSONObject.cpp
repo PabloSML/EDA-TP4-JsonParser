@@ -1,9 +1,9 @@
 #include "JSONObject.h"
+#include "FSMMonster.h"
 #include <cstring>
 #include <array>
 #include <cctype>
 #include <iostream>
-#define INITIALSIZE 100
 
 using namespace std;
 //#define MARKERS "{[\"tfn-0123456789" // Todos los posibles primeros caracteres de un json value
@@ -35,7 +35,7 @@ bool
 JSONObject::parseInput(string& s) {
 	bool success = false;
 
-	if (!ErrorCheck(s)) { //el string que parseamos esta bien formado
+	if (!errorCheck(s)) { //el string que parseamos esta bien formado
 		fieldCount = howManyFields(s);
 		fields = new Field[fieldCount];
 		int i = 0;
@@ -745,4 +745,34 @@ JSONObject::copyArrayValue(const char* f, unsigned int pos)
 	}
 
 	return copy;
+}
+
+bool 
+JSONObject::errorCheck(string& s)
+{
+	bool fail = true;
+	bool quit = false;
+	unsigned int length = s.length();
+	FSMMonster fsm(&err);
+	eventMonster ev;
+
+	for (unsigned int i = 0; i < length && !quit; i++)
+	{
+		ev = fsm.getEvent(s[i]);
+		fsm.cycle(ev);
+		
+		if (err.hasFailed())
+			quit = true;
+
+		else if (fsm.wasEvGenCreated())		// si fue creada una sub-maquina de analisis es necesario repetir el caracter
+		{
+			i--;
+			fsm.setEvGenCreated(false);
+		}
+	}
+
+	if (!quit)
+		fail = false;
+
+	return fail;
 }
