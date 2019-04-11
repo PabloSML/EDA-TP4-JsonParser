@@ -1,20 +1,13 @@
 #include <iostream>
 #include "FSMDigit.h" //incluye definicion de states
-//#include "FSMDigitAux.h" //incluye la deficion de la estructura FMSCell
-#include "FMSCell.h"
 
 using namespace std;
 
 FSMDigit::FSMDigit() : Eventgenerator()
 {
+	currentEvent = events::DIGITS;
 	currentState = states::INITIAL;
-	err = NULL;
-}
-
-FSMDigit::FSMDigit(JSONError* err) : Eventgenerator()
-{
-	currentState = states::INITIAL;
-	this->err = err;
+	//err = NULL;
 }
 
 void FSMDigit::cycle() {
@@ -28,7 +21,7 @@ void FSMDigit::cycle() {
 												{ {states::QUIT, ok},		{states::QUIT, ok},     {states::QUIT, ok},     {states::ERROR, error}, {states::QUIT, ok},     {states::ERROR, error}, {states::QUIT, ok},     {states::QUIT, ok},      {states::ERROR, error}, {states::QUIT, ok}} }; Esta esta mal*/
 
 										//EVENTS		DIGITS						ZERO					COMA					NEGATIVE				 E						PLUS					ELSE					QUIT			STATES
-	const FMSCell FSMTable[STATES][EVENTS] = {	{ {states::DIGIT, ok},		{states::ZERONOT, ok},	{states::ERROR, error},	{states::NEGATIVE, ok},	{states::ERROR, error},	{states::ERROR, error},	{states::ERROR, error},	{states::QUIT, ok}},	// INITIAL
+	const FSMCell FSMTable[STATES][EVENTS] = {	{ {states::DIGIT, ok},		{states::ZERONOT, ok},	{states::ERROR, error},	{states::NEGATIVE, ok},	{states::ERROR, error},	{states::ERROR, error},	{states::ERROR, error},	{states::QUIT, ok}},	// INITIAL
 												{ {states::DIGIT, ok},		{states::DIGIT, ok},	{states::ERROR, error},	{states::ERROR, error},	{states::EXPOI, error},	{states::ERROR, error},	{states::ERROR, error},	{states::ERROR, error}},// NEGATIVE
 												{ {states::DIGIT, ok},		{states::DIGIT, ok},	{states::COMAI, ok},	{states::ERROR, error},	{states::EXPOI, ok},	{states::ERROR, error},	{states::ERROR, error},	{states::QUIT, ok}},	// DIGIT
 												{ {states::DIGIT, ok},		{states::DIGIT, ok},	{states::ERROR, error},	{states::ERROR, error},	{states::ERROR, error},	{states::ERROR, error},	{states::ERROR, error},	{states::ERROR, error}},// COMAI
@@ -41,7 +34,7 @@ void FSMDigit::cycle() {
 											};
 
 
-	FSMTable[currentState][currentEvent].action(err); 
+	FSMTable[currentState][currentEvent].action(getReport()); 
 	currentState = FSMTable[currentState][currentEvent].nextState;
 
 }
@@ -66,7 +59,7 @@ FSMDigit::getEvent(char s)
 		currentEvent = events::E;
 	}
 	else if (s == '+') {
-		currentEvent = events::PLUS
+		currentEvent = events::PLUS;
 	}
 	else if (s == NULL) {
 		currentEvent = events::QUIT;
@@ -78,13 +71,4 @@ FSMDigit::getEvent(char s)
 
 states FSMDigit::getState(){
 	return currentState;
-}
-
-void ok(void* UserData){
-	//return;
-}
-
-void error(void* UserData) {
-	((JSONError*)UserData)->setErrorString(ERROR_NUM);
-	//return false;
 }

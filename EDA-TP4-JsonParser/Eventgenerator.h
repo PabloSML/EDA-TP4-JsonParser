@@ -8,14 +8,19 @@ public:
 
 	Eventgenerator(){}
 
-	event_t getReport() { return ev; }
-	void setReport(event_t ev) { this->ev = ev; }
+	event_t* getReport() { return report; }
+	void setReport(event_t ev) { *(this->report) = ev; }
 
 	virtual void cycle() = 0;
 
 	virtual void getEvent(char c) = 0;
 
 private:
+	event_t* report;
 
-	event_t ev;
 };
+
+void start(void* userData);
+void ok(void* userData);
+void error(void* userData);
+void quit(void* userData);

@@ -4,7 +4,7 @@
 
 typedef struct {
 	states nextState;
-	bool(*action)(void* UserData);
+	void(*action)(void* userData);
 
 }FMSCell;
 

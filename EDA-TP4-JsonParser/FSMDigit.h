@@ -1,8 +1,11 @@
 #pragma once
-//#include "FSMDigitAux.h"
 #include "Eventgenerator.h"
+#define ERROR_NUM "Number badly formed"
+#define STATES 10
+#define EVENTS 8
 
-enum states { INITIAL, NEGATIVE, DIGIT, COMAI, COMA, EXPOI, EXPONENT, ZERONOT, ERROR, QUIT };
+
+enum states { INITIAL = 0, NEGATIVE, DIGIT, COMAI, COMA, EXPOI, EXPONENT, ZERONOT, ERROR, QUIT };
 //INITIAL: en este estado solo puede haber "-" o digitos inicluido el cero
 //NEG: en este estado solo puede haber coma, exponente o digitos o quit
 //DIG: en este estado solo puede haber coma, exponente o digitos o quit
@@ -13,14 +16,18 @@ enum states { INITIAL, NEGATIVE, DIGIT, COMAI, COMA, EXPOI, EXPONENT, ZERONOT, E
 //ZERONOT: en este estado solo puede haber digitos distintos de cero, coma, exponente o QUIT
 //ERROR: se llega en caso de que haya habido un caracter invalido en otro estado
 //QUIT: se llega a este estado si termino el parseo y no se encontraron errores
-enum class events { DIGITS, ZERO, COMA, NEGATIVE, E, PLUS, ELSE, QUIT };
+enum events { DIGITS = 0, ZERO, COMA, NEGATIVE, E, PLUS, ELSE, QUIT };
+
+typedef struct {
+	states nextState;
+	void(*action)(void* UserData);
+
+}FSMCell;
 
 class FSMDigit : public Eventgenerator {
 public:
 	
-	FSMDigit() : Eventgenerator();
-	FSMDigit(JSONError* err) : Eventgenerator();
-
+	FSMDigit();
 
 	states getState();
 
@@ -30,8 +37,5 @@ public:
 private:
 	events currentEvent;
 	states currentState;
-	JSONError* err; //recibe una referenca al error que se encuentra almacenado en JSON y de haber uno lo acutaliza a false y expecifica el tipo
 };
 
-void ok(void* UserData);
-void error(void *UserData);
