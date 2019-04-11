@@ -46,7 +46,7 @@ FSMMonster::getEvent(char c)
 	{
 		evGen->getEvent(c);
 		evGen->cycle();
-		switch (*(evGen->getReport()))
+		switch (evGen->getReport())
 		{
 		case event_t::CONTINUE:
 			return_value = eventMonster::SUBCONTINUE;

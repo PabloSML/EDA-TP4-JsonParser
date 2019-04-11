@@ -117,14 +117,12 @@
   <ItemGroup>
     <ClInclude Include="Eventgenerator.h" />
     <ClInclude Include="field.h" />
-    <ClInclude Include="FSMCell.h" />
     <ClInclude Include="FSMDigit.h" />
     <ClInclude Include="FSMMonster.h" />
     <ClInclude Include="JSONError.h" />
     <ClInclude Include="JSONObject.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Eventgenerator.cpp" />
     <ClCompile Include="field.cpp" />
     <ClCompile Include="FSMDigit.cpp" />
     <ClCompile Include="FSMMonster.cpp" />

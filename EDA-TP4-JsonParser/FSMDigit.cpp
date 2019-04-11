@@ -10,16 +10,8 @@ FSMDigit::FSMDigit() : Eventgenerator()
 	this->setLabel(string("number"));
 }
 
-void FSMDigit::cycle() {
-	/*const FMSCell FSMTable[STATES][EVENTS] = {  { {states::DIGIT, ok},	{states::DIGIT, ok},	{states::DIGIT, ok},    {states::DIGIT, ok},    {states::COMA, ok},		{states::ERROR, error},	{states::EXPONENT, ok}, {states::DIGIT, ok},     {states::ERROR, error}, {states::QUIT, ok}},
-												{ {states::ZERONOT, ok},  	{states::DIGIT, ok},	{states::DIGIT, ok},	{states::DIGIT, ok},    {states::COMA, ok},		{states::ERROR, error},	{states::EXPONENT, ok}, {states::ERROR, error},  {states::ERROR, error}, {states::QUIT, ok}},
-												{ {states::ERROR, error},	{states::COMA, error},  {states::COMA, ok},		{states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error},	{states::ERROR, error}, {states::COMA, ok},      {states::ERROR, error}, {states::QUIT, ok}},
-												{ {states::NEGATIVE, ok},	{states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::EXPONENT, ok},	{states::ERROR, error}, {states::ERROR, error},  {states::ERROR, error}, {states::QUIT, ok}},
-												{ {states::ERROR, error},	{states::EXPOI, error}, {states::EXPOI, ok},	{states::ERROR, error}, {states::EXPOI, ok},	{states::ERROR, error},	{states::ERROR, error}, {states::EXPOI, ok},     {states::ERROR, error}, {states::QUIT, ok}},
-												{ {states::ERROR, error},	{states::ERROR, error}, {states::ERROR, error},	{states::ERROR, error}, {states::ERROR, error}, {states::EXPONENT, ok},	{states::ERROR, error}, {states::ERROR, error},  {states::ERROR, error}, {states::QUIT, ok}},
-												{ {states::ERROR, error},   {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error}, {states::ERROR, error},  {states::ERROR, error}, {states::QUIT, ok}},
-												{ {states::QUIT, ok},		{states::QUIT, ok},     {states::QUIT, ok},     {states::ERROR, error}, {states::QUIT, ok},     {states::ERROR, error}, {states::QUIT, ok},     {states::QUIT, ok},      {states::ERROR, error}, {states::QUIT, ok}} }; Esta esta mal*/
-
+void 
+FSMDigit::cycle() {
 										//EVENTS		DIGITS						ZERO					COMA					NEGATIVE				 E						PLUS					ELSE					QUIT			STATES
 	const FSMCellD FSMTable[STATES][EVENTS] = {	{ {states::DIGIT, ok},		{states::ZERONOT, ok},	{states::ERROR, error},	{states::NEGATIVE, ok},	{states::ERROR, error},	{states::ERROR, error},	{states::ERROR, error},	{states::QUIT, ok}},	// INITIAL
 												{ {states::DIGIT, ok},		{states::DIGIT, ok},	{states::ERROR, error},	{states::ERROR, error},	{states::EXPOI, error},	{states::ERROR, error},	{states::ERROR, error},	{states::ERROR, error}},// NEGATIVE
@@ -33,10 +25,8 @@ void FSMDigit::cycle() {
 												{ {states::QUIT, ok},		{states::QUIT, ok},		{states::QUIT, ok},		{states::QUIT, ok},		{states::QUIT, ok},		{states::QUIT, ok},		{states::QUIT, ok},		{states::QUIT, ok}}		// QUIT
 											};
 
-
-	FSMTable[currentState][currentEvent].action(getReport()); 
+	FSMTable[currentState][currentEvent].action(this); 
 	currentState = FSMTable[currentState][currentEvent].nextState;
-
 }
 
 
@@ -69,6 +59,28 @@ FSMDigit::getEvent(char s)
 	}
 }
 
-states FSMDigit::getState(){
+states 
+FSMDigit::getState(){
 	return currentState;
+}
+
+void 
+ok(void*userData)
+{
+	FSMDigit* tempFSM = (FSMDigit*)userData;
+	tempFSM->setReport(event_t::CONTINUE);
+}
+
+void 
+error(void*userData)
+{
+	FSMDigit* tempFSM = (FSMDigit*)userData;
+	tempFSM->setReport(event_t::ERROR);
+}
+
+void 
+quit(void*userData)
+{
+	FSMDigit* tempFSM = (FSMDigit*)userData;
+	tempFSM->setReport(event_t::QUIT);
 }
