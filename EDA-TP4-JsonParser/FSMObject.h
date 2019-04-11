@@ -1,29 +1,29 @@
 #pragma once
 #include "Eventgenerator.h"
 
-enum states { INITIAL = 0, PONERMAS};
-enum events { OPENBRACKET = 0, PONERMAS};
+enum states { INITIAL = 0, PONERMAS };
+enum events { OPENKEY = 0, PONERMAS };
 
 typedef struct {
 	states nextState;
 	void(*action)(void* UserData);
 
-}FSMCellA;
+}FSMCellO;
 
-class FSMArray : public Eventgenerator {
+class FSMObject : public Eventgenerator {
 
 public:
-	FSMArray();
+	FSMObject();
 
 	states getState();
-	
+
 	virtual void getEvent(char c);
 	virtual void cycle();
 
 	virtual event_t getReport(void) { return report; }
 	virtual void setReport(event_t report) { this->report = report; }
 
-private: 
+private:
 	events currentEvent;
 	states currentState;
 

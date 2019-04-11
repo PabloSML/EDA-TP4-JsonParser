@@ -117,8 +117,10 @@
   <ItemGroup>
     <ClInclude Include="Eventgenerator.h" />
     <ClInclude Include="field.h" />
+    <ClInclude Include="FSMArray.h" />
     <ClInclude Include="FSMDigit.h" />
     <ClInclude Include="FSMMonster.h" />
+    <ClInclude Include="FSMObject.h" />
     <ClInclude Include="JSONError.h" />
     <ClInclude Include="JSONObject.h" />
   </ItemGroup>
